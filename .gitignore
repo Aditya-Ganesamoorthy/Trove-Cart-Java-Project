@@ -1,0 +1,13 @@
+# NetBeans build output
+Project/build/
+Project/dist/
+Project/nbproject/private/
+
+# OS files
+desktop.ini
+Thumbs.db
+.DS_Store
+
+# IDE
+*.class
+*.rs
