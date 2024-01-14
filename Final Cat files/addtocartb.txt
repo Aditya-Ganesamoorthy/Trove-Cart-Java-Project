@@ -1,0 +1,716 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+import javax.imageio.ImageIO;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+//import java.util.TimerTask;
+
+class Product {
+
+    private String id;
+    private String name;
+    private String category;
+    private String description;
+    private double price;
+    private String imageURL;
+    private String imageURL2;
+    private String imageURL3;
+
+    Product(String id, String name, String category, String description, double price, String imageURL, String imageURL2, String imageURL3) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.description = description;
+        this.price = price;
+        this.imageURL = imageURL;
+        this.imageURL2 = imageURL2;
+        this.imageURL3 = imageURL3;
+
+    }
+
+    String getId() {
+        return id;
+    }
+
+    String getName() {
+        return name;
+    }
+
+    String getCategory() {
+        return category;
+    }
+
+    String getDescription() {
+        return description;
+    }
+
+    double getPrice() {
+        return price;
+    }
+
+    String getImageURL() {
+        return imageURL;
+    }
+
+    String getImageURL2() {
+        return imageURL2;
+    }
+
+    String getImageURL3() {
+        return imageURL3;
+    }
+
+}
+
+class ProductDetailsGUI extends JFrame {
+
+    Color customColor1 = new Color(0xEFA965); // Hexadecimal value for Orange
+
+    ProductDetailsGUI(Product product) {
+        setTitle("Product Details");
+        setSize(750, 430);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel detailsPanel = new JPanel();
+        detailsPanel.setLayout(new BorderLayout());
+
+        JPanel imagePanel = new JPanel(new FlowLayout());
+
+        try {
+            URL imageURL1 = new URL(product.getImageURL());
+            URL imageURL2 = new URL(product.getImageURL2());
+            URL imageURL3 = new URL(product.getImageURL3());
+
+            BufferedImage img1 = ImageIO.read(imageURL1);
+            BufferedImage img2 = ImageIO.read(imageURL2);
+            BufferedImage img3 = ImageIO.read(imageURL3);
+
+            JLabel imageLabel1 = new JLabel(new ImageIcon(img1.getScaledInstance(175, 175, Image.SCALE_SMOOTH)));
+            JLabel imageLabel2 = new JLabel(new ImageIcon(img2.getScaledInstance(180, 175, Image.SCALE_SMOOTH)));
+            JLabel imageLabel3 = new JLabel(new ImageIcon(img3.getScaledInstance(175, 175, Image.SCALE_SMOOTH)));
+
+            imagePanel.add(imageLabel1);
+            imagePanel.add(imageLabel2);
+            imagePanel.add(imageLabel3);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        JPanel productInfoPanel = new JPanel();
+        productInfoPanel.setLayout(new BoxLayout(productInfoPanel, BoxLayout.Y_AXIS));
+
+        JLabel nameLabel = new JLabel("           Name: " + product.getName());
+
+        JLabel space1 = new JLabel("                           ");
+        JLabel space2 = new JLabel("                           ");
+        JLabel space3 = new JLabel("                           ");
+        JLabel space4 = new JLabel("                           ");
+        JLabel space5 = new JLabel("                           ");
+
+        JLabel categoryLabel = new JLabel("           Category: " + product.getCategory());
+
+        JLabel priceLabel = new JLabel("           Price: " + product.getPrice());
+
+        String fullDescription = product.getDescription();
+        int halfLength = fullDescription.length() / 2;
+        String part1 = fullDescription.substring(0, halfLength);
+        String part2 = fullDescription.substring(halfLength);
+        JLabel descriptionLabel1 = new JLabel("           Description: " + part1);
+        JLabel descriptionLabel2 = new JLabel("                                    " + part2);
+
+        JButton addToCartButton = new JButton("ADD TO CART ");
+        // addToCartButton.setBounds(500, 500, 60, 30);
+        addToCartButton.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        addToCartButton.setForeground(Color.BLACK);
+        addToCartButton.setBackground(customColor1);
+        addToCartButton.setEnabled(true);
+        addToCartButton.setBorder(BorderFactory.createLineBorder(Color.red, 3)); // Add border
+
+        addToCartButton.addActionListener(e -> {
+            JOptionPane.showMessageDialog(null, product.getName() + " added to cart!");
+        });
+
+        productInfoPanel.add(space1);
+        productInfoPanel.add(nameLabel);
+        productInfoPanel.add(space2);
+
+        productInfoPanel.add(categoryLabel);
+        productInfoPanel.add(space3);
+
+        productInfoPanel.add(priceLabel);
+        productInfoPanel.add(space4);
+
+        productInfoPanel.add(descriptionLabel1);
+        productInfoPanel.add(descriptionLabel2);
+        productInfoPanel.add(space5);
+
+        productInfoPanel.add(addToCartButton);
+
+        detailsPanel.add(imagePanel, BorderLayout.NORTH);
+        detailsPanel.add(productInfoPanel, BorderLayout.CENTER);
+
+        getContentPane().add(detailsPanel);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+}
+
+class EcommerceAppGUI extends JFrame { //implements ActionListener{
+
+    JPanel Panel4;
+
+    private JLabel imageLabel2, imageLabel3, imageLabel4, imageLabel5, imageLabel6 ;
+    Color customColor1 = new Color(0xEFA965); // Hexadecimal value for Orange
+    Color customColor2 = new Color(0x382399); // Dark light blue
+
+    private List<Product> products;
+    private List<Product> cart;
+    private int currentPage;
+
+    EcommerceAppGUI() {
+
+        setTitle("TROVE CART - LANDING PAGE");
+        setSize(820, 730);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Setting the application logo as the icon for the title bar
+        //ImageIcon logoIcon = new ImageIcon("C:/Users/adity/Documents/Java Project 2023/Trove logo - compressed.png"); // Replace with your logo image path
+        //setIconImage(logoIcon.getImage());
+        ImageIcon logoIcon = null; // Declare logoIcon variable
+
+        // Load image from URL
+        BufferedImage logoImage = null;
+        try {
+            URL imageURL = new URL("https://media.licdn.com/dms/image/D5622AQGetGGktFdvAQ/feedshare-shrink_800/0/1701203043604?e=1704326400&v=beta&t=P-t-PRXgNyAcXURb4KI7OhDkljUE5E3dQ157KzZdxsg"); // Replace with your image URL
+            logoImage = ImageIO.read(imageURL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (logoImage != null) {
+            logoIcon = new ImageIcon(logoImage);
+            setIconImage(logoIcon.getImage());
+        }
+
+        Panel4 = new JPanel(null); // Using null layout
+        Panel4.setPreferredSize(new Dimension(820, 1200)); // Set the preferred size of the main panel to enable scrolling
+        Panel4.setBackground(Color.black);
+
+        // Creating a bar-like panel for the top components
+        JPanel topPanel1 = new JPanel();
+        topPanel1.setBackground(Color.LIGHT_GRAY);
+        topPanel1.setBounds(0, 60, 820, 3); // Adjust the bounds as needed
+        add(topPanel1);
+
+        JPanel topPanel2 = new JPanel();
+        topPanel2.setBackground(Color.LIGHT_GRAY);
+        topPanel2.setBounds(0, 470, 820, 3); // Adjust the bounds as needed
+        add(topPanel2);
+
+        JLabel dealsLabel = new JLabel();
+        dealsLabel.setForeground(customColor1); // Set text color
+        dealsLabel.setFont(new Font("Times new Roman", Font.BOLD, 18)); // Increase font size
+        dealsLabel.setBounds(250, 80, 500, 20);
+        Panel4.add(dealsLabel, BorderLayout.CENTER);
+        // "Choose Your Category !!"
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQF2VsdNjX490Q/feedshare-shrink_800/0/1701276420508?e=1704326400&v=beta&t=KeHnQHXR86Pv8uUiDdOi-xHRB_kRKaUN6CDGO9uLlnc");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel2 = new JLabel(imageIcon);
+            imageLabel2.setBounds(80, 115, 70, 90);
+            Panel4.add(imageLabel2);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQF2VsdNjX490Q/feedshare-shrink_800/0/1701276420508?e=1704326400&v=beta&t=KeHnQHXR86Pv8uUiDdOi-xHRB_kRKaUN6CDGO9uLlnc");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel3 = new JLabel(imageIcon);
+            imageLabel3.setBounds(180, 115, 70, 90);
+            Panel4.add(imageLabel3);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQF2VsdNjX490Q/feedshare-shrink_800/0/1701276420508?e=1704326400&v=beta&t=KeHnQHXR86Pv8uUiDdOi-xHRB_kRKaUN6CDGO9uLlnc");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel4 = new JLabel(imageIcon);
+            imageLabel4.setBounds(280, 115, 70, 90);
+            Panel4.add(imageLabel4);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQF2VsdNjX490Q/feedshare-shrink_800/0/1701276420508?e=1704326400&v=beta&t=KeHnQHXR86Pv8uUiDdOi-xHRB_kRKaUN6CDGO9uLlnc");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel5 = new JLabel(imageIcon);
+            imageLabel5.setBounds(380, 115, 70, 90);
+            Panel4.add(imageLabel5);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQF2VsdNjX490Q/feedshare-shrink_800/0/1701276420508?e=1704326400&v=beta&t=KeHnQHXR86Pv8uUiDdOi-xHRB_kRKaUN6CDGO9uLlnc");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel6 = new JLabel(imageIcon);
+            imageLabel6.setBounds(480, 115, 70, 90);
+            Panel4.add(imageLabel6);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQF2VsdNjX490Q/feedshare-shrink_800/0/1701276420508?e=1704326400&v=beta&t=KeHnQHXR86Pv8uUiDdOi-xHRB_kRKaUN6CDGO9uLlnc");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel6 = new JLabel(imageIcon);
+            imageLabel6.setBounds(580, 115, 70, 90);
+            Panel4.add(imageLabel6);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQF2VsdNjX490Q/feedshare-shrink_800/0/1701276420508?e=1704326400&v=beta&t=KeHnQHXR86Pv8uUiDdOi-xHRB_kRKaUN6CDGO9uLlnc");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel6 = new JLabel(imageIcon);
+            imageLabel6.setBounds(680, 115, 70, 90);
+            Panel4.add(imageLabel6);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        // Application Logo Image (Placeholder) - Added near the title bar
+        JLabel logoLabel = new JLabel(logoIcon);
+        logoLabel.setBounds(0, 10, 100, 50); // Adjust the bounds as needed
+        add(logoLabel);
+
+        // My Account Text with Emoji
+        JLabel myAccountLabel = new JLabel("My Account 👤"); // Emoji: 👤
+        myAccountLabel.setBounds(620, 10, 82, 30); // Adjust the bounds as needed
+        myAccountLabel.setForeground(Color.white);
+        myAccountLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myAccountLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("Clicked on My Account");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                myAccountLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myAccountLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(myAccountLabel);
+
+        // My Cart Text with Emoji
+        JLabel myCartLabel = new JLabel("My Cart 🛒"); // Emoji: 🛒
+        myCartLabel.setBounds(720, 10, 60, 30); // Adjust the bounds as needed
+        myCartLabel.setForeground(Color.WHITE);
+        myCartLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myCartLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Cart
+                System.out.println("Clicked on My Cart");
+                // Add your action here, like opening the cart
+
+                // Visual feedback
+                myCartLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myCartLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(myCartLabel);
+
+        // Category Grocery Text with Emoji
+        JLabel groceryLabel = new JLabel("Grocery 🥕");
+        groceryLabel.setBounds(85, 200, 62, 30); // Adjust the bounds as needed
+        groceryLabel.setForeground(Color.white);
+        groceryLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        groceryLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("Clicked on My Grocery");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                groceryLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> groceryLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(groceryLabel);
+
+        // Category Mobiles Text with Emoji
+        JLabel mobileLabel = new JLabel("Mobile 📱");
+        mobileLabel.setBounds(192, 200, 54, 30); // Adjust the bounds as needed
+        mobileLabel.setForeground(Color.white);
+        mobileLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        mobileLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("Clicked on My Mobiles");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                mobileLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> mobileLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(mobileLabel);
+
+        // Category Mens Fashion Text with Emoji
+        JLabel mensFashionLabel = new JLabel("Men 👕");
+        mensFashionLabel.setBounds(297, 200, 40, 30); // Adjust the bounds as needed
+        mensFashionLabel.setForeground(Color.white);
+        mensFashionLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        mensFashionLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("Clicked on My Mens Fashion");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                mensFashionLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> mensFashionLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(mensFashionLabel);
+
+        // Category Mens Fashion Text with Emoji
+        JLabel womensFashionLabel = new JLabel("Womens 👗");
+        womensFashionLabel.setBounds(385, 200, 70, 30); // Adjust the bounds as needed
+        womensFashionLabel.setForeground(Color.white);
+        womensFashionLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        womensFashionLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("Clicked on My Womens Fashion");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                womensFashionLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> womensFashionLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(womensFashionLabel);
+
+        // Category Mens Fashion Text with Emoji
+        JLabel electronicLabel = new JLabel("Electronics 🔌");
+        electronicLabel.setBounds(480, 200, 80, 30); // Adjust the bounds as needed
+        electronicLabel.setForeground(Color.white);
+        electronicLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        electronicLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("Clicked on My Electronics");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                electronicLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> electronicLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(electronicLabel);
+
+        // Category Mens Fashion Text with Emoji
+        JLabel beautyLabel = new JLabel("Beauty ✨"); //Beauty
+        beautyLabel.setBounds(588, 200, 70, 30); // Adjust the bounds as needed
+        beautyLabel.setForeground(Color.white);
+        beautyLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        beautyLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("Clicked on My Beauty");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                beautyLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> beautyLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(beautyLabel);
+
+        // Category Mens Fashion Text with Emoji
+        JLabel kidsLabel = new JLabel("Kids 🎮"); //Kids
+        kidsLabel.setBounds(690, 200, 70, 30); // Adjust the bounds as needed
+        kidsLabel.setForeground(Color.white);
+        kidsLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        kidsLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("Clicked on My Kids");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                kidsLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> kidsLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(kidsLabel);
+
+        // Search Bar
+        JTextField searchField = new JTextField();
+        searchField.setBounds(140, 15, 380, 30); // Adjust the bounds as needed
+        searchField.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchField.setForeground(Color.BLACK); // Set the text color
+        searchField.setBorder(BorderFactory.createLineBorder(Color.GRAY)); // Set border color (optional)
+        JButton searchButton = new JButton("🔍");
+        searchButton.setBounds(520, 15, 47, 30); // Adjust the bounds as needed
+        searchButton.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchButton.setForeground(Color.BLACK); // Set the text color
+        // searchButton.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+
+        // Adding focus listener to hide/show text
+        searchField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (searchField.getText().equals("Search in Trove")) {
+                    searchField.setText("");
+                    searchField.setForeground(Color.BLACK); // Change text color to black
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (searchField.getText().isEmpty()) {
+                    searchField.setForeground(Color.GRAY); // Set text color back to gray
+                    searchField.setText("Search in Trove");
+                }
+            }
+        });
+
+        Panel4.add(searchField);
+        Panel4.add(searchButton);
+
+// ****** PRODUCTS LISTING METHODS STARTS ********        
+        // Define the list of product IDs you want to fetch
+        List<String> specificProductIDs = new ArrayList<>();
+        specificProductIDs.add("1004");
+        specificProductIDs.add("1005");
+        //specificProductIDs.add("1004");
+
+        // Add more product IDs as needed
+        // Fetch products based on specific IDs
+        products = fetchProductsFromDatabase(specificProductIDs);
+        // Rest of your code remains the same...
+        cart = new ArrayList<>();
+
+        JPanel productsPanel = new JPanel(new GridLayout(0, 2, 10 /*Horizontal space */, 10 /*Vertical space */)); // GridLayout for products
+        productsPanel.setBackground(Color.black);
+        productsPanel.setBounds(15, 490, 770, 155);
+
+        displayProducts(productsPanel, currentPage);
+        Panel4.add(productsPanel);
+        getContentPane().add(Panel4, BorderLayout.CENTER);
+        setLocationRelativeTo(null);
+
+        JButton backButton = new JButton("Back");
+        backButton.setBounds(230, 653, 100, 30);
+        backButton.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        backButton.setForeground(Color.BLACK);
+        backButton.setBackground(customColor1);
+        backButton.setEnabled(true);
+        backButton.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+
+        backButton.addActionListener(new BackButtonActionListener());
+        Panel4.add(backButton);
+
+        JButton nextButton = new JButton("Next");
+        nextButton.setBounds(380, 653, 100, 30);
+        nextButton.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        nextButton.setForeground(Color.BLACK);
+        nextButton.setBackground(customColor1);
+        nextButton.setEnabled(true);
+        nextButton.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+        nextButton.addActionListener(new NextButtonActionListener());
+        Panel4.add(nextButton);
+
+        currentPage = 0;
+
+        add(Panel4);
+        setVisible(true);
+    }
+
+   // METHODS FOR PRODUCTS LIST
+    private List<Product> fetchProductsFromDatabase(List<String> productIDs) {
+        List<Product> productList = new ArrayList<>();
+
+        try (Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "system", "1234")) {
+            // Creating a SQL query string with a WHERE clause to fetch products by IDs
+            String query = "SELECT * FROM Products_list WHERE id IN (";
+            for (int i = 0; i < productIDs.size(); i++) {
+                query += "'" + productIDs.get(i) + "'";
+                if (i < productIDs.size() - 1) {
+                    query += ",";
+                }
+            }
+            query += ")";
+
+            try (Statement statement = con.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
+
+                while (resultSet.next()) {
+                    String id = resultSet.getString("id");
+                    String name = resultSet.getString("name");
+                    String category = resultSet.getString("category");
+                    String description = resultSet.getString("description");
+                    double price = resultSet.getDouble("price");
+                    String imageURL = resultSet.getString("imageURL");
+                    String imageURL2 = resultSet.getString("imageURL2");
+                    String imageURL3 = resultSet.getString("imageURL3");
+
+                    Product product = new Product(id, name, category, description, price, imageURL, imageURL2, imageURL3);
+                    productList.add(product);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle any exceptions or error messages here
+        }
+
+        return productList;
+    }
+
+private void displayProducts(JPanel productsPanel, int page) {
+    productsPanel.removeAll(); // Clear existing components
+    productsPanel.setLayout(new GridLayout(0, 2, 10, 10)); // Set GridLayout
+
+    for (Product product : products) {
+        JPanel productPanel = new JPanel(new BorderLayout());
+
+        try {
+            URL imageURL = new URL(product.getImageURL());
+            BufferedImage img = ImageIO.read(imageURL);
+            JLabel imageLabel = new JLabel(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+            productPanel.add(imageLabel, BorderLayout.CENTER);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        JTextArea detailsArea = new JTextArea(
+                "      \n       " + product.getName() + " \n\n\n       Rs. " + product.getPrice() + "\n\n\n      " + product.getDescription()
+        );
+        detailsArea.setFont(new Font("Times new roman", Font.BOLD, 15));
+        detailsArea.setForeground(Color.BLACK);
+        detailsArea.setEditable(false);
+        detailsArea.setBackground(customColor1);
+        productPanel.add(detailsArea, BorderLayout.SOUTH);
+
+        JButton viewProductButton = new JButton("View product");
+        viewProductButton.addActionListener(new ViewProductActionListener(product));
+        productPanel.add(viewProductButton, BorderLayout.SOUTH);
+
+        productPanel.setBorder(BorderFactory.createLineBorder(customColor2, 4));
+        productsPanel.add(productPanel);
+    }
+
+    // Ensure components are immediately displayed
+    productsPanel.revalidate();
+    productsPanel.repaint();
+}
+
+
+    private class ViewProductActionListener implements ActionListener {
+
+        private Product product;
+
+        public ViewProductActionListener(Product product) {
+            this.product = product;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new ProductDetailsGUI(product);
+        }
+    }
+
+    /* private class ViewProductActionListener implements ActionListener {
+
+        private Product product;
+
+        public ViewProductActionListener(Product product) {
+            this.product = product;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            cart.add(product);
+            JOptionPane.showMessageDialog(null, product.getName() + " added to cart!");
+        }
+    } */
+    private class NextButtonActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            currentPage++;
+            // refreshProductDisplay();
+        }
+    }
+
+    private class BackButtonActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (currentPage > 0) {
+                currentPage--;
+                // refreshProductDisplay();
+            }
+        }
+    }
+}
+
+
+public class Add_to_cart {
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            new EcommerceAppGUI();
+        });
+    }
+}
