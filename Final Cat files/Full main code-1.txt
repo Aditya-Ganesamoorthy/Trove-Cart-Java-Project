@@ -1,0 +1,4210 @@
+//  ********************* FULL MAIN CODE SUBMITTED @CAT ************************        
+
+// ************  APP STRUCTURE *****************
+// First Welcome to TROVE [PANEL 0]
+// Choose Login or Signup [PANEL 0]
+// If Login --> Login page [PANEL 1]
+// If Signup --> Signup page [PANEL 2]
+// Sign up continued by Address page --> [PANEL 3]
+// LOGIN BUTTON CLICK --> LANDING PAGE[PANEL 4]
+// SIGN UP BUTTON CLICK --> LOGIN PAGE
+// LANDING PAGE --> SUBDIVIDED INTO 17 PANELS
+// PANEL 4 -> LANDING PAGE ; 5, 6, 7 ARE PAGES FOR TOP DEALS OF THE DAY
+// PANEL 8, 9 --> CATEGORY PAGES FOR GROCERY ITEMS
+// PANEL 10, 11 --> CATEGORY PAGES FOR MOBILE ITEMS
+// PANEL 12, 13 --> CATEGORY PAGES FOR MENS FASHION
+// PANEL 14, 15 --> CATEGORY PAGES FOR WOMENS FASHION
+// PANEL 16, 17 --> CATEGORY PAGES FOR ELECTRONICS
+// PANEL 18, 19 --> CATEGORY PAGES FOR BEAUTY ITEMS
+// PANEL 20, 21 --> CATEGORY PAGES FOR KIDS SECTION
+// ****************** FULL MAIN CODE STARTS **********************
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+import javax.imageio.ImageIO;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+//import pack1.Address;
+class Product {
+
+    private String id;
+    private String name;
+    private String category;
+    private String description;
+    private double price;
+    private String imageURL;
+    private String imageURL2;
+    private String imageURL3;
+
+    Product(String id, String name, String category, String description, double price, String imageURL, String imageURL2, String imageURL3) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.description = description;
+        this.price = price;
+        this.imageURL = imageURL;
+        this.imageURL2 = imageURL2;
+        this.imageURL3 = imageURL3;
+    }
+
+    String getId() {
+        return id;
+    }
+
+    String getName() {
+        return name;
+    }
+
+    String getCategory() {
+        return category;
+    }
+
+    String getDescription() {
+        return description;
+    }
+
+    double getPrice() {
+        return price;
+    }
+
+    String getImageURL() {
+        return imageURL;
+    }
+
+    String getImageURL2() {
+        return imageURL2;
+    }
+
+    String getImageURL3() {
+        return imageURL3;
+    }
+}
+
+class PaymentPanel extends JFrame {
+
+    Color customColor1 = new Color(0xEFA965); // Hexadecimal value for Orange
+
+    PaymentPanel() {
+        setTitle("Payment Details");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel paymentPanel = new JPanel();
+        paymentPanel.setLayout(new BoxLayout(paymentPanel, BoxLayout.Y_AXIS));
+
+        JLabel cardTypeLabel = new JLabel("Type of Card Used:");
+        JComboBox<String> cardTypeComboBox = new JComboBox<>(new String[]{"Visa", "MasterCard", "American Express"});
+        cardTypeComboBox.setSelectedIndex(0);
+
+        JLabel cardDetailsLabel = new JLabel("Card Details:");
+        JTextField cardDetailsField = new JTextField();
+
+        JButton payButton = new JButton("PAY");
+        payButton.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        payButton.setForeground(Color.BLACK);
+        payButton.setBackground(customColor1);
+        payButton.setEnabled(true);
+        payButton.setBorder(BorderFactory.createLineBorder(Color.red, 3));
+
+        payButton.addActionListener(e -> {
+            // Handle payment logic here
+            JOptionPane.showMessageDialog(null, "Payment successful!");
+            dispose(); // Close the payment panel after successful payment
+        });
+
+        paymentPanel.add(Box.createVerticalStrut(20));
+        paymentPanel.add(cardTypeLabel);
+        paymentPanel.add(cardTypeComboBox);
+        paymentPanel.add(Box.createVerticalStrut(20));
+        paymentPanel.add(cardDetailsLabel);
+        paymentPanel.add(cardDetailsField);
+        paymentPanel.add(Box.createVerticalStrut(20));
+        paymentPanel.add(payButton);
+
+        getContentPane().add(paymentPanel);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+}
+
+class ProductDetailsGUI extends JFrame {
+
+    Color customColor1 = new Color(0xEFA965); // Hexadecimal value for Orange
+    private List<Product> products;
+
+    ProductDetailsGUI(Product product) {
+        setTitle("Product Details");
+        setSize(750, 430);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel detailsPanel = new JPanel();
+        detailsPanel.setLayout(new BorderLayout());
+
+        JPanel imagePanel = new JPanel(new FlowLayout());
+
+        try {
+            URL imageURL1 = new URL(product.getImageURL());
+            URL imageURL2 = new URL(product.getImageURL2());
+            URL imageURL3 = new URL(product.getImageURL3());
+
+            BufferedImage img1 = ImageIO.read(imageURL1);
+            BufferedImage img2 = ImageIO.read(imageURL2);
+            BufferedImage img3 = ImageIO.read(imageURL3);
+
+            JLabel imageLabel1 = new JLabel(new ImageIcon(img1.getScaledInstance(175, 175, Image.SCALE_SMOOTH)));
+            JLabel imageLabel2 = new JLabel(new ImageIcon(img2.getScaledInstance(180, 175, Image.SCALE_SMOOTH)));
+            JLabel imageLabel3 = new JLabel(new ImageIcon(img3.getScaledInstance(175, 175, Image.SCALE_SMOOTH)));
+
+            imagePanel.add(imageLabel1);
+            imagePanel.add(imageLabel2);
+            imagePanel.add(imageLabel3);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        JPanel productInfoPanel = new JPanel();
+        productInfoPanel.setLayout(new BoxLayout(productInfoPanel, BoxLayout.Y_AXIS));
+
+        JLabel nameLabel = new JLabel("           Name: " + product.getName());
+
+        JLabel space1 = new JLabel("                           ");
+        JLabel space2 = new JLabel("                           ");
+        JLabel space3 = new JLabel("                           ");
+        JLabel space4 = new JLabel("                           ");
+        JLabel space5 = new JLabel("                           ");
+
+        JLabel categoryLabel = new JLabel("           Category: " + product.getCategory());
+
+        JLabel priceLabel = new JLabel("           Price: " + product.getPrice());
+
+        String fullDescription = product.getDescription();
+        int halfLength = fullDescription.length() / 2;
+        String part1 = fullDescription.substring(0, halfLength);
+        String part2 = fullDescription.substring(halfLength);
+        JLabel descriptionLabel1 = new JLabel("           Description: " + part1);
+        JLabel descriptionLabel2 = new JLabel("                                    " + part2);
+
+        JButton addToCartButton = new JButton("                                                                     ADD TO CART                                                                                    ");
+        // addToCartButton.setBounds(500, 500, 60, 30);
+        addToCartButton.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        addToCartButton.setForeground(Color.BLACK);
+        addToCartButton.setBackground(customColor1);
+        addToCartButton.setEnabled(true);
+        addToCartButton.setBorder(BorderFactory.createLineBorder(Color.red, 3)); // Add border
+
+        addToCartButton.addActionListener(e -> {
+            JOptionPane.showMessageDialog(null, product.getName() + " added to cart!");
+        });
+
+        productInfoPanel.add(space1);
+        productInfoPanel.add(nameLabel);
+        productInfoPanel.add(space2);
+
+        productInfoPanel.add(categoryLabel);
+        productInfoPanel.add(space3);
+
+        productInfoPanel.add(priceLabel);
+        productInfoPanel.add(space4);
+
+        productInfoPanel.add(descriptionLabel1);
+        productInfoPanel.add(descriptionLabel2);
+        productInfoPanel.add(space5);
+
+        productInfoPanel.add(addToCartButton);
+
+        detailsPanel.add(imagePanel, BorderLayout.NORTH);
+        detailsPanel.add(productInfoPanel, BorderLayout.CENTER);
+
+        getContentPane().add(detailsPanel);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+}
+
+class Trove_cart extends JFrame {
+
+    // ************ START OF WELCOME PAGE ************
+    JPanel Panel0, Panel1, Panel2, Panel3, Panel4;
+
+    JLabel welcomeLabel1 = new JLabel("     HELLO USER ! ");
+    JLabel welcomeLabel2 = new JLabel(" Welcome to Trove Cart !");
+    JLabel welcomeLabel3 = new JLabel("                Discover a world of shopping delights within Trove Cart");
+    JLabel welcomeLabel4 = new JLabel("your ultimate destination for all things e-commerce !");
+    JLabel welcomeLabel5 = new JLabel("Sign up or log in to unlock a treasure trove of shopping experiences ! ");
+
+    JButton LogInButton1 = new JButton("LOG IN");
+    JButton SignUpButton1 = new JButton("SIGN UP");
+    private JLabel imageLabel1;
+    boolean logedIn1 = false;
+    boolean signedup1 = false;
+
+    // ********** END OF WELCOME PAGE *******************
+    // ********** START OF LOGIN PAGE *******************
+    JLabel emailLabel = new JLabel("EMAIL :");
+    JLabel passwordLabel = new JLabel("PASSWORD :");
+
+    JTextField emailTextField = new JTextField();
+    JPasswordField passwordField = new JPasswordField();
+
+    JButton logInButton2 = new JButton("LOG IN");
+    private JLabel imageLabel2;
+    boolean logedIn2 = false;
+    JButton backButton1 = new JButton("BACK");
+    boolean backed1 = false;
+    boolean firstTimeSignUp = true; // Add this variable
+
+    // ************* END OF LOGIN PAGE ******************
+    // ********** START OF SIGNUP PAGE *******************
+    JLabel userNameLabel = new JLabel("USER NAME :");
+    JLabel dobLabel = new JLabel("DOB :");
+    JLabel genderLabel = new JLabel("GENDER :");
+    JLabel phoneNumberLabel = new JLabel("PHONE NO :");
+    JLabel emailLabel_s1 = new JLabel("EMAIL :");
+    JLabel passwordLabel_s1 = new JLabel("PASSWORD :");
+    JLabel rePasswordLabel_s1 = new JLabel("RE-ENTER PASSWORD :");
+
+    JTextField userNameTextField = new JTextField();
+    JTextField dobTextField = new JTextField();
+    JTextField genderTextField = new JTextField();
+    JTextField phoneNumberTextField = new JTextField();
+    JTextField emailTextField_s1 = new JTextField();
+    JPasswordField passwordField_s1 = new JPasswordField();
+    JPasswordField rePasswordField_s1 = new JPasswordField();
+
+    JButton signUpButton = new JButton("SIGN UP");
+    private JLabel imageLabel3;
+    boolean signedUp2 = false;
+
+    // ************ END OF SIGNUP PAGE 1 ********************
+    // ************* START OF ADDRESS PAGE ******************
+    JLabel doorNoLabel = new JLabel("DOOR NO :");
+    JLabel streetNameLabel = new JLabel("STREET NAME :");
+    JLabel townLabel = new JLabel("TOWN :");
+    JLabel districtLabel = new JLabel("DISTRICT :");
+    JLabel stateLabel = new JLabel("STATE :");
+    JLabel pincodeLabel = new JLabel("PINCODE :");
+
+    JTextField doorNoTextField = new JTextField();
+    JTextField streetNameTextField = new JTextField();
+    JTextField townTextField = new JTextField();
+    JTextField districtTextField = new JTextField();
+    JTextField stateTextField = new JTextField();
+    JTextField pincodeTextField = new JTextField();
+
+    JButton saveAddressButton = new JButton("SAVE");
+    private JLabel imageLabel4;
+    boolean saved = false;
+
+    // ************ END OF ADDRESS PAGE  *****************
+    // ************ START OF LANDING PAGE'S ****************
+    JPanel Panel5, Panel6, Panel7;
+    JPanel Panel8, Panel9, Panel10, Panel11, Panel12, Panel13;
+    JPanel Panel14, Panel15, Panel16, Panel17, Panel18, Panel19, Panel20, Panel21;
+
+    private JLabel slideImageLabel1, slideImageLabel2, slideImageLabel3, slideImageLabel4;
+    private Timer slideshowTimer; // Timer for the slideshow
+    private int currentSlide = 0;
+    private JLabel imageLabel_l1, imageLabel_l2, imageLabel_l4, imageLabel_l5, imageLabel_l6, imageLabel_l7, imageLabel_l8;
+
+    Color customColor1 = new Color(0xEFA965); // Hexadecimal value for Orange
+    Color customColor2 = new Color(0x382399); // Dark light blue
+
+    private List<Product> products1;
+    private List<Product> cart1;
+    private int currentPage;
+    private List<Product> products2;
+    private List<Product> cart2;
+    private List<Product> products3;
+    private List<Product> cart3;
+    private List<Product> products4;
+    private List<Product> cart4;
+    private List<Product> products5;
+    private List<Product> cart5;
+    private List<Product> products6;
+    private List<Product> cart6;
+    private List<Product> products7;
+    private List<Product> cart7;
+    private List<Product> products8;
+    private List<Product> cart8;
+    private List<Product> products;
+
+    Trove_cart() {
+
+        // *************  START OF WELCOME PAGE *************
+        setTitle("TROVE CART - WELCOME PAGE");
+        setSize(820, 730);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // *******  PANEL0 IS FOR WELCOME PAGE *********
+        Panel0 = new JPanel(null);
+        Panel0.setBackground(Color.black);
+
+        // ******** PANEL1 IS FOR LOGIN PAGE *********
+        Panel1 = new JPanel(null);
+        Panel1.setBackground(Color.black);
+
+        // ******** PANEL2 IS FOR SIGN UP PAGE *********
+        Panel2 = new JPanel(null);
+        Panel2.setBackground(Color.black);
+
+        // ******** PANEL3 IS FOR SIGN UP ADDRESS PAGE *********
+        Panel3 = new JPanel(null);
+        Panel3.setBackground(Color.black);
+
+        // ******** PANEL4 IS THE LANDING PAGE *********
+        Panel4 = new JPanel(null);
+        Panel4.setBackground(Color.black);
+
+        welcomeLabel1.setBounds(312, 410, 700, 50);
+        welcomeLabel1.setFont(new Font("Times new Roman", Font.BOLD, 20));
+        welcomeLabel1.setForeground(Color.WHITE);
+
+        welcomeLabel2.setBounds(160, 445, 700, 50);
+        welcomeLabel2.setFont(new Font("Times new Roman", Font.ITALIC, 17));
+        welcomeLabel2.setForeground(Color.WHITE);
+
+        welcomeLabel3.setBounds(275, 445, 700, 50);
+        welcomeLabel3.setFont(new Font("Times new Roman", Font.ITALIC, 17));
+        welcomeLabel3.setForeground(Color.WHITE);
+
+        welcomeLabel4.setBounds(160, 468, 700, 50);
+        welcomeLabel4.setFont(new Font("Times new Roman", Font.ITALIC, 17));
+        welcomeLabel4.setForeground(Color.WHITE);
+
+        welcomeLabel5.setBounds(160, 600, 700, 50);
+        welcomeLabel5.setFont(new Font("Times new Roman", Font.ITALIC, 17));
+        welcomeLabel5.setForeground(Color.WHITE);
+
+        LogInButton1.setBounds(300, 550, 100, 30);
+        SignUpButton1.setBounds(420, 550, 100, 30);
+
+        Panel0.add(welcomeLabel1);
+        Panel0.add(welcomeLabel2);
+        Panel0.add(welcomeLabel3);
+        Panel0.add(welcomeLabel4);
+        Panel0.add(welcomeLabel5);
+
+        Panel0.add(LogInButton1);
+        Panel0.add(SignUpButton1);
+
+        LogInButton1.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        LogInButton1.setForeground(Color.BLACK);
+        LogInButton1.setBackground(Color.RED);
+        LogInButton1.setEnabled(true);
+        LogInButton1.setBorder(BorderFactory.createLineBorder(Color.orange, 4)); // Add border
+
+        SignUpButton1.setFont(new Font("Times new Roman", Font.BOLD, 17));
+        SignUpButton1.setForeground(Color.BLACK);
+        SignUpButton1.setBackground(Color.RED);
+        SignUpButton1.setEnabled(true);
+        SignUpButton1.setBorder(BorderFactory.createLineBorder(Color.orange, 4)); // Add border
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQF6jQTiMOx8Vg/feedshare-shrink_2048_1536/0/1700947727412?e=1710979200&v=beta&t=hqvh9Q7q1oKlOxrHjF8h3LLgpyXdJfZAXkF1GsuyJRc");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel1 = new JLabel(imageIcon);
+            imageLabel1.setBounds(-15, 0, 850, 375);
+            Panel0.add(imageLabel1);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        add(Panel0);
+        LogInButton1.addActionListener(new LogInButton1ActionListener());
+        SignUpButton1.addActionListener(new SignUpButton1ActionListener());
+        setVisible(true);
+
+        // ********** END OF WELCOME PAGE *************
+        // ********** START OF LOGIN PAGE *************
+        emailLabel.setBounds(220, 520, 180, 30);
+        emailLabel.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        emailLabel.setForeground(Color.WHITE);
+
+        passwordLabel.setBounds(220, 560, 180, 30);
+        passwordLabel.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        passwordLabel.setForeground(Color.WHITE);
+
+        emailTextField.setBounds(440, 520, 230, 26);
+        emailTextField.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        emailTextField.setForeground(Color.DARK_GRAY);
+
+        passwordField.setBounds(440, 560, 230, 26);
+        passwordField.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        passwordField.setForeground(Color.DARK_GRAY);
+
+        logInButton2.setBounds(325, 630, 100, 30);
+        backButton1.setBounds(475, 630, 100, 30);
+
+        Panel1.add(emailLabel);
+        Panel1.add(passwordLabel);
+        Panel1.add(emailTextField);
+        Panel1.add(passwordField);
+
+        Panel1.add(logInButton2);
+        Panel1.add(backButton1);
+
+        logInButton2.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        logInButton2.setForeground(Color.BLACK);
+        logInButton2.setBackground(Color.RED);
+        logInButton2.setEnabled(true);
+        logInButton2.setBorder(BorderFactory.createLineBorder(Color.orange, 4)); // Add border
+
+        backButton1.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        backButton1.setForeground(Color.BLACK);
+        backButton1.setBackground(Color.RED);
+        backButton1.setEnabled(true);
+        backButton1.setBorder(BorderFactory.createLineBorder(Color.orange, 4)); // Add border
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQEN8unxEA6WIw/feedshare-shrink_800/0/1700989406574?e=1710979200&v=beta&t=To8tOwf3w7PdOAGN6Zmhby6ylMFc3Kn-HfN1Vb9Gz4E");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel2 = new JLabel(imageIcon);
+            imageLabel2.setBounds(-10, 0, 858, 400);
+            Panel1.add(imageLabel2);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        //add(Panel1);
+        logInButton2.addActionListener(new logInButton2ActionListener());
+        setVisible(true);
+        backButton1.addActionListener(new backButton1ActionListener());
+        setVisible(true);
+        setPlaceholder(passwordField, "Enter your Trove Password");
+
+        // *********** START OF SIGNUP PAGE 1 **************
+        userNameLabel.setBounds(220, 320, 180, 30);
+        userNameLabel.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        userNameLabel.setForeground(Color.WHITE);
+
+        dobLabel.setBounds(220, 360, 180, 30);
+        dobLabel.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        dobLabel.setForeground(Color.WHITE);
+
+        genderLabel.setBounds(220, 400, 180, 30);
+        genderLabel.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        genderLabel.setForeground(Color.WHITE);
+
+        phoneNumberLabel.setBounds(220, 440, 180, 30);
+        phoneNumberLabel.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        phoneNumberLabel.setForeground(Color.WHITE);
+
+        emailLabel_s1.setBounds(220, 480, 180, 30);
+        emailLabel_s1.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        emailLabel_s1.setForeground(Color.WHITE);
+
+        passwordLabel_s1.setBounds(220, 520, 180, 30);
+        passwordLabel_s1.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        passwordLabel_s1.setForeground(Color.WHITE);
+
+        rePasswordLabel_s1.setBounds(220, 560, 200, 30);
+        rePasswordLabel_s1.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        rePasswordLabel_s1.setForeground(Color.WHITE);
+
+        userNameTextField.setBounds(440, 320, 230, 26);
+        userNameTextField.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        userNameTextField.setForeground(Color.DARK_GRAY);
+
+        dobTextField.setBounds(440, 360, 230, 26);
+        dobTextField.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        dobTextField.setForeground(Color.DARK_GRAY);
+
+        genderTextField.setBounds(440, 400, 230, 26);
+        genderTextField.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        genderTextField.setForeground(Color.DARK_GRAY);
+
+        phoneNumberTextField.setBounds(440, 440, 230, 26);
+        phoneNumberTextField.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        phoneNumberTextField.setForeground(Color.DARK_GRAY);
+
+        emailTextField_s1.setBounds(440, 480, 230, 26);
+        emailTextField_s1.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        emailTextField_s1.setForeground(Color.DARK_GRAY);
+
+        passwordField_s1.setBounds(440, 520, 230, 26);
+        passwordField_s1.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        passwordField_s1.setForeground(Color.DARK_GRAY);
+
+        rePasswordField_s1.setBounds(440, 560, 230, 26);
+        rePasswordField_s1.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        rePasswordField_s1.setForeground(Color.DARK_GRAY);
+
+        signUpButton.setBounds(360, 645, 100, 30);
+
+        Panel2.add(userNameLabel);
+        Panel2.add(dobLabel);
+        Panel2.add(emailLabel_s1);
+        Panel2.add(genderLabel);
+        Panel2.add(passwordLabel_s1);
+        Panel2.add(rePasswordLabel_s1);
+        Panel2.add(phoneNumberLabel);
+
+        Panel2.add(userNameTextField);
+        Panel2.add(dobTextField);
+        Panel2.add(genderTextField);
+        Panel2.add(phoneNumberTextField);
+        Panel2.add(emailTextField_s1);
+        Panel2.add(passwordField_s1);
+        Panel2.add(rePasswordField_s1);
+
+        Panel2.add(signUpButton);
+
+        signUpButton.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        signUpButton.setForeground(Color.BLACK);
+        signUpButton.setBackground(Color.RED);
+        signUpButton.setEnabled(true);
+        signUpButton.setBorder(BorderFactory.createLineBorder(Color.orange, 4)); // Add border
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQEz0goLDZSr3w/feedshare-shrink_2048_1536/0/1700670694032?e=1703721600&v=beta&t=76YT3-kAoeKe8PJmDSxLgqbwjffTifj4WNOJvtV5ANU");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel3 = new JLabel(imageIcon);
+            imageLabel3.setBounds(-50, -20, 900, 337);
+            Panel2.add(imageLabel3);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        //add(Panel2);
+        signUpButton.addActionListener(new signUpButtonActionListener());
+        setVisible(true);
+
+        setPlaceholder_s1(passwordField_s1, "Create your Trove Password");
+        setPlaceholder_s2(rePasswordField_s1, "Re-enter your Trove password");
+
+        // ************ END OF SIGNUP PAGE 1 *****************
+        // ************* START OF ADDRESS PAGE ****************
+        doorNoLabel.setBounds(230, 395, 180, 30);
+        doorNoLabel.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        doorNoLabel.setForeground(Color.WHITE);
+
+        streetNameLabel.setBounds(230, 435, 180, 30);
+        streetNameLabel.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        streetNameLabel.setForeground(Color.WHITE);
+
+        townLabel.setBounds(230, 475, 180, 30);
+        townLabel.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        townLabel.setForeground(Color.WHITE);
+
+        districtLabel.setBounds(230, 515, 180, 30);
+        districtLabel.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        districtLabel.setForeground(Color.WHITE);
+
+        stateLabel.setBounds(230, 555, 180, 30);
+        stateLabel.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        stateLabel.setForeground(Color.WHITE);
+
+        pincodeLabel.setBounds(230, 595, 180, 30);
+        pincodeLabel.setFont(new Font("Times new Roman", Font.BOLD, 14));
+        pincodeLabel.setForeground(Color.WHITE);
+
+        doorNoTextField.setBounds(430, 395, 200, 26);
+        doorNoTextField.setFont(new Font("Times new Roman", Font.BOLD, 15));
+        doorNoTextField.setForeground(Color.DARK_GRAY);
+
+        streetNameTextField.setBounds(430, 435, 200, 26);
+        streetNameTextField.setFont(new Font("Times new Roman", Font.BOLD, 14));
+        streetNameTextField.setForeground(Color.DARK_GRAY);
+
+        townTextField.setBounds(430, 475, 200, 26);
+        townTextField.setFont(new Font("Times new Roman", Font.BOLD, 14));
+        townTextField.setForeground(Color.DARK_GRAY);
+
+        districtTextField.setBounds(430, 515, 200, 26);
+        districtTextField.setFont(new Font("Times new Roman", Font.BOLD, 14));
+        districtTextField.setForeground(Color.DARK_GRAY);
+
+        stateTextField.setBounds(430, 555, 200, 26);
+        stateTextField.setFont(new Font("Times new Roman", Font.BOLD, 14));
+        stateTextField.setForeground(Color.DARK_GRAY);
+
+        pincodeTextField.setBounds(430, 595, 200, 26);
+        pincodeTextField.setFont(new Font("Times new Roman", Font.BOLD, 14));
+        pincodeTextField.setForeground(Color.DARK_GRAY);
+
+        saveAddressButton.setBounds(360, 645, 100, 30);
+
+        Panel3.add(doorNoLabel);
+        Panel3.add(streetNameLabel);
+        Panel3.add(townLabel);
+        Panel3.add(stateLabel);
+        Panel3.add(districtLabel);
+        Panel3.add(pincodeLabel);
+
+        Panel3.add(doorNoTextField);
+        Panel3.add(streetNameTextField);
+        Panel3.add(townTextField);
+        Panel3.add(districtTextField);
+        Panel3.add(stateTextField);
+        Panel3.add(pincodeTextField);
+
+        Panel3.add(saveAddressButton);
+
+        saveAddressButton.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        saveAddressButton.setForeground(Color.BLACK);
+        saveAddressButton.setBackground(Color.RED);
+        saveAddressButton.setEnabled(true);
+        saveAddressButton.setBorder(BorderFactory.createLineBorder(Color.orange, 4)); // Add border
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQFUL7MZs6kxlQ/feedshare-shrink_800/0/1700679489037?e=1703721600&v=beta&t=Q_SEzO4-vC4zC7C7rKW4SJvIpeAe7GDN-fkOe04DT0g");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel4 = new JLabel(imageIcon);
+            imageLabel4.setBounds(17, 0, 800, 380);
+            Panel3.add(imageLabel4);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        saveAddressButton.addActionListener(new saveAddressButtonActionListener());
+        setVisible(true);
+
+        // ************ END OF ADDRESS PAGE *****************
+        // ************ START OF LANDING PAGE ****************
+        // Setting the application logo as the icon for the title bar
+        ImageIcon logoIcon = null; // Declare logoIcon variable
+        BufferedImage logoImage = null;
+        try {
+            URL imageURL = new URL("https://media.licdn.com/dms/image/D5622AQGetGGktFdvAQ/feedshare-shrink_800/0/1701203043604?e=1704326400&v=beta&t=P-t-PRXgNyAcXURb4KI7OhDkljUE5E3dQ157KzZdxsg"); // Replace with your image URL
+            logoImage = ImageIO.read(imageURL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (logoImage != null) {
+            logoIcon = new ImageIcon(logoImage);
+            setIconImage(logoIcon.getImage());
+        }
+
+        Panel4 = new JPanel(null); // Using null layout
+        Panel4.setPreferredSize(new Dimension(820, 1200)); // Set the preferred size of the main panel to enable scrolling
+        Panel4.setBackground(Color.black);
+
+        Panel5 = new JPanel(null); // Using null layout
+        Panel5.setBackground(Color.black);
+        Panel5.setPreferredSize(new Dimension(820, 1200));
+
+        Panel6 = new JPanel(null); // Using null layout
+        Panel6.setBackground(Color.black);
+        Panel6.setPreferredSize(new Dimension(820, 1200));
+
+        Panel7 = new JPanel(null); // Using null layout
+        Panel7.setBackground(Color.black);
+        Panel7.setPreferredSize(new Dimension(820, 1200));
+
+        Panel8 = new JPanel(null); // Using null layout
+        Panel8.setBackground(Color.black);
+        Panel8.setPreferredSize(new Dimension(820, 1200));
+
+        Panel9 = new JPanel(null); // Using null layout
+        Panel9.setBackground(Color.black);
+        Panel9.setPreferredSize(new Dimension(820, 1200));
+
+        Panel10 = new JPanel(null); // Using null layout
+        Panel10.setBackground(Color.black);
+        Panel10.setPreferredSize(new Dimension(820, 1200));
+
+        Panel11 = new JPanel(null); // Using null layout
+        Panel11.setBackground(Color.black);
+        Panel11.setPreferredSize(new Dimension(820, 1200));
+
+        Panel12 = new JPanel(null); // Using null layout
+        Panel12.setBackground(Color.black);
+        Panel12.setPreferredSize(new Dimension(820, 1200));
+
+        /*  ImageIcon logoIcon2 = null; // Declare logoIcon2 variable
+        // Load image from URL
+        BufferedImage logoImage2 = null;
+        try {
+            URL imageURL = new URL("https://media.licdn.com/dms/image/D5622AQGetGGktFdvAQ/feedshare-shrink_800/0/1701203043604?e=1704326400&v=beta&t=P-t-PRXgNyAcXURb4KI7OhDkljUE5E3dQ157KzZdxsg"); // Replace with your image URL
+            logoImage2 = ImageIO.read(imageURL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (logoImage2 != null) {
+            logoIcon2 = new ImageIcon(logoImage2);
+            setIconImage(logoIcon2.getImage());
+        }
+
+        ImageIcon logoIcon3 = null; // Declare logoIcon variable
+        // Load image from URL
+        BufferedImage logoImage3 = null;
+        try {
+            URL imageURL = new URL("https://media.licdn.com/dms/image/D5622AQGetGGktFdvAQ/feedshare-shrink_800/0/1701203043604?e=1704326400&v=beta&t=P-t-PRXgNyAcXURb4KI7OhDkljUE5E3dQ157KzZdxsg"); // Replace with your image URL
+            logoImage3 = ImageIO.read(imageURL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (logoImage3 != null) {
+            logoIcon3 = new ImageIcon(logoImage3);
+            setIconImage(logoIcon3.getImage());
+        }
+
+        ImageIcon logoIcon4 = null; // Declare logoIcon4 variable
+        // Load image from URL
+        BufferedImage logoImage4 = null;
+        try {
+            URL imageURL = new URL("https://media.licdn.com/dms/image/D5622AQGetGGktFdvAQ/feedshare-shrink_800/0/1701203043604?e=1704326400&v=beta&t=P-t-PRXgNyAcXURb4KI7OhDkljUE5E3dQ157KzZdxsg"); // Replace with your image URL
+            logoImage4 = ImageIO.read(imageURL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (logoImage4 != null) {
+            logoIcon4 = new ImageIcon(logoImage4);
+            setIconImage(logoIcon4.getImage());
+        }  */
+
+ /* ImageIcon logoIcon5 = null; // Declare logoIcon4 variable
+        // Load image from URL
+        BufferedImage logoImage5 = null;
+        try {
+            URL imageURL = new URL("https://media.licdn.com/dms/image/D5622AQGetGGktFdvAQ/feedshare-shrink_800/0/1701203043604?e=1704326400&v=beta&t=P-t-PRXgNyAcXURb4KI7OhDkljUE5E3dQ157KzZdxsg"); // Replace with your image URL
+            logoImage5 = ImageIO.read(imageURL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (logoImage5 != null) {
+            logoIcon5 = new ImageIcon(logoImage5);
+            setIconImage(logoIcon5.getImage());
+        } */
+
+ /* ImageIcon logoIcon5 = null; // Declare logoIcon4 variable
+        // Load image from URL
+        BufferedImage logoImage5 = null;
+        try {
+            URL imageURL = new URL("https://media.licdn.com/dms/image/D5622AQGetGGktFdvAQ/feedshare-shrink_800/0/1701203043604?e=1704326400&v=beta&t=P-t-PRXgNyAcXURb4KI7OhDkljUE5E3dQ157KzZdxsg"); // Replace with your image URL
+            logoImage5 = ImageIO.read(imageURL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (logoImage6 != null) {
+            logoIcon6 = new ImageIcon(logoImage6);
+            setIconImage(logoIcon6.getImage());
+        } */
+
+ /* ImageIcon logoIcon6 = null; // Declare logoIcon4 variable
+        // Load image from URL
+        BufferedImage logoImage6 = null;
+        try {
+            URL imageURL = new URL("https://media.licdn.com/dms/image/D5622AQGetGGktFdvAQ/feedshare-shrink_800/0/1701203043604?e=1704326400&v=beta&t=P-t-PRXgNyAcXURb4KI7OhDkljUE5E3dQ157KzZdxsg"); // Replace with your image URL
+            logoImage6 = ImageIO.read(imageURL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (logoImage7 != null) {
+            logoIcon7 = new ImageIcon(logoImage7);
+            setIconImage(logoIcon6.getImage());
+        } */
+
+ /* ImageIcon logoIcon7 = null; // Declare logoIcon4 variable
+        // Load image from URL
+        BufferedImage logoImage7 = null;
+        try {
+            URL imageURL = new URL("https://media.licdn.com/dms/image/D5622AQGetGGktFdvAQ/feedshare-shrink_800/0/1701203043604?e=1704326400&v=beta&t=P-t-PRXgNyAcXURb4KI7OhDkljUE5E3dQ157KzZdxsg"); // Replace with your image URL
+            logoImage7 = ImageIO.read(imageURL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (logoImage8 != null) {
+            logoIcon8 = new ImageIcon(logoImage8);
+            setIconImage(logoIcon8.getImage());
+        } */
+
+ /* ImageIcon logoIcon8 = null; // Declare logoIcon4 variable
+        // Load image from URL
+        BufferedImage logoImage8 = null;
+        try {
+            URL imageURL = new URL("https://media.licdn.com/dms/image/D5622AQGetGGktFdvAQ/feedshare-shrink_800/0/1701203043604?e=1704326400&v=beta&t=P-t-PRXgNyAcXURb4KI7OhDkljUE5E3dQ157KzZdxsg"); // Replace with your image URL
+            logoImage8 = ImageIO.read(imageURL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (logoImage9 != null) {
+            logoIcon9 = new ImageIcon(logoImage4);
+            setIconImage(logoIcon9.getImage());
+        } */
+        // Creating a bar-like panel for the top components
+        JPanel topPanel1 = new JPanel();
+        topPanel1.setBackground(Color.LIGHT_GRAY);
+        topPanel1.setBounds(0, 60, 820, 3); // Adjust the bounds as needed
+        Panel4.add(topPanel1);
+
+        JPanel topPanel2 = new JPanel();
+        topPanel2.setBackground(Color.LIGHT_GRAY);
+        topPanel2.setBounds(0, 440, 820, 3); // Adjust the bounds as needed
+        Panel4.add(topPanel2);
+
+        // MOVING TEXT FOR CATEGORY 
+        JLabel dealsLabel1 = new JLabel();
+        dealsLabel1.setForeground(customColor1); // Set text color
+        dealsLabel1.setFont(new Font("Times new Roman", Font.BOLD, 18)); // Increase font size
+        dealsLabel1.setBounds(250, 80, 500, 20);
+        Panel4.add(dealsLabel1, BorderLayout.CENTER);
+        // "Choose Your Category !!"
+
+        String text1 = "<<<     Choose Your Category !!     >>>                    ";
+        int repeatCount1 = 150; // Set the number of times the typewriter effect should repeat
+        Timer typeWriterTimer1 = new Timer(150 /*{ Text Speed }*/, new ActionListener() {
+            int index = 0;
+            int count = 0;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (count < repeatCount1) {
+                    if (index <= text1.length()) {
+                        dealsLabel1.setText(text1.substring(0, index));
+                        index++;
+                    } else {
+                        index = 0;
+                        count++;
+                    }
+                } else {
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        typeWriterTimer1.start();
+
+        /* JPanel topPanel3 = new JPanel();
+        topPanel3.setBackground(Color.DARK_GRAY);
+        topPanel3.setBounds(26, 100, 750, 90); // Adjust the bounds as needed
+        add(topPanel3); */
+        /// MOVING TEXT TOP DEALS 1
+        JLabel dealsLabel2 = new JLabel();
+        dealsLabel2.setForeground(customColor1); // Set text color
+        dealsLabel2.setFont(new Font("Times new Roman", Font.BOLD, 18)); // Increase font size
+        dealsLabel2.setBounds(250, 455, 500, 20);
+        Panel4.add(dealsLabel2, BorderLayout.CENTER);
+
+        String text2 = "<<<     Top Deals For You !!     >>>                    ";
+        int repeatCount2 = 150; // Set the number of times the typewriter effect should repeat
+        Timer typeWriterTimer2 = new Timer(150 /*{ Text Speed }*/, new ActionListener() {
+            int index = 0;
+            int count = 0;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (count < repeatCount2) {
+                    if (index <= text2.length()) {
+                        dealsLabel2.setText(text2.substring(0, index));
+                        index++;
+                    } else {
+                        index = 0;
+                        count++;
+                    }
+                } else {
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        typeWriterTimer2.start();
+
+        // MOVING TEXT FOR Deals 2
+        JLabel dealsLabel3 = new JLabel();
+        dealsLabel3.setForeground(customColor1); // Set text color
+        dealsLabel3.setFont(new Font("Times new Roman", Font.BOLD, 18)); // Increase font size
+        dealsLabel3.setBounds(250, 75, 500, 20);
+        Panel5.add(dealsLabel3);
+
+        String text3 = "<<<     TOP DEALS FOR YOU !!     >>>                    ";
+        int repeatCount3 = 150; // Set the number of times the typewriter effect should repeat
+        Timer typeWriterTimer3 = new Timer(150 /*{ Text Speed }*/, new ActionListener() {
+            int index = 0;
+            int count = 0;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (count < repeatCount3) {
+                    if (index <= text3.length()) {
+                        dealsLabel3.setText(text3.substring(0, index));
+                        index++;
+                    } else {
+                        index = 0;
+                        count++;
+                    }
+                } else {
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        typeWriterTimer3.start();
+
+        // MOVING TEXT FOR DEALS 3
+        JLabel dealsLabel4 = new JLabel();
+        dealsLabel4.setForeground(customColor1); // Set text color
+        dealsLabel4.setFont(new Font("Times new Roman", Font.BOLD, 18)); // Increase font size
+        dealsLabel4.setBounds(250, 75, 500, 20);
+        Panel6.add(dealsLabel4);
+
+        String text4 = "<<<     TOP DEALS FOR YOU !!     >>>                    ";
+        int repeatCount4 = 150; // Set the number of times the typewriter effect should repeat
+        Timer typeWriterTimer4 = new Timer(150 /*{ Text Speed }*/, new ActionListener() {
+            int index = 0;
+            int count = 0;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (count < repeatCount4) {
+                    if (index <= text4.length()) {
+                        dealsLabel4.setText(text4.substring(0, index));
+                        index++;
+                    } else {
+                        index = 0;
+                        count++;
+                    }
+                } else {
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        typeWriterTimer4.start();
+
+        // MOVING TEXT FOR DEALS 4
+        JLabel dealsLabel5 = new JLabel();
+        dealsLabel5.setForeground(customColor1); // Set text color
+        dealsLabel5.setFont(new Font("Times new Roman", Font.BOLD, 18)); // Increase font size
+        dealsLabel5.setBounds(250, 75, 500, 20);
+        Panel7.add(dealsLabel5);
+
+        String text5 = "<<<     TOP DEALS FOR YOU !!     >>>                    ";
+        int repeatCount5 = 150; // Set the number of times the typewriter effect should repeat
+        Timer typeWriterTimer5 = new Timer(150 /*{ Text Speed }*/, new ActionListener() {
+            int index = 0;
+            int count = 0;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (count < repeatCount5) {
+                    if (index <= text5.length()) {
+                        dealsLabel5.setText(text5.substring(0, index));
+                        index++;
+                    } else {
+                        index = 0;
+                        count++;
+                    }
+                } else {
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        typeWriterTimer5.start();
+
+        // MOVING TEXT FOR DEALS 6
+        JLabel dealsLabel6 = new JLabel();
+        dealsLabel6.setForeground(customColor1); // Set text color
+        dealsLabel6.setFont(new Font("Times new Roman", Font.BOLD, 18)); // Increase font size
+        dealsLabel6.setBounds(250, 75, 500, 20);
+        Panel8.add(dealsLabel6);
+
+        String text6 = "<<<     GROCERY DEALS FOR YOU !!     >>>                    ";
+        int repeatCount6 = 150; // Set the number of times the typewriter effect should repeat
+        Timer typeWriterTimer6 = new Timer(150 /*{ Text Speed }*/, new ActionListener() {
+            int index = 0;
+            int count = 0;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (count < repeatCount6) {
+                    if (index <= text6.length()) {
+                        dealsLabel6.setText(text6.substring(0, index));
+                        index++;
+                    } else {
+                        index = 0;
+                        count++;
+                    }
+                } else {
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        typeWriterTimer6.start();
+
+        // MOVING TEXT FOR DEALS 7
+        JLabel dealsLabel7 = new JLabel();
+        dealsLabel7.setForeground(customColor1); // Set text color
+        dealsLabel7.setFont(new Font("Times new Roman", Font.BOLD, 18)); // Increase font size
+        dealsLabel7.setBounds(250, 75, 500, 20);
+        Panel9.add(dealsLabel7);
+
+        String text7 = "<<<     GROCERY DEALS FOR YOU !!     >>>                    ";
+        int repeatCount7 = 150; // Set the number of times the typewriter effect should repeat
+        Timer typeWriterTimer7 = new Timer(150 /*{ Text Speed }*/, new ActionListener() {
+            int index = 0;
+            int count = 0;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (count < repeatCount7) {
+                    if (index <= text7.length()) {
+                        dealsLabel7.setText(text7.substring(0, index));
+                        index++;
+                    } else {
+                        index = 0;
+                        count++;
+                    }
+                } else {
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        typeWriterTimer7.start();
+
+        // MOVING TEXT FOR DEALS 8
+        JLabel dealsLabel8 = new JLabel();
+        dealsLabel8.setForeground(customColor1); // Set text color
+        dealsLabel8.setFont(new Font("Times new Roman", Font.BOLD, 18)); // Increase font size
+        dealsLabel8.setBounds(250, 75, 500, 20);
+        Panel10.add(dealsLabel8);
+
+        String text8 = "<<<     MOBILE DEALS FOR YOU !!     >>>                    ";
+        int repeatCount8 = 150; // Set the number of times the typewriter effect should repeat
+        Timer typeWriterTimer8 = new Timer(150, new ActionListener() {
+            int index = 0;
+            int count = 0;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (count < repeatCount8) {
+                    if (index <= text8.length()) {
+                        dealsLabel8.setText(text8.substring(0, index));
+                        index++;
+                    } else {
+                        index = 0;
+                        count++;
+                    }
+                } else {
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        typeWriterTimer8.start();
+
+        // MOVING TEXT FOR DEALS 9
+        JLabel dealsLabel9 = new JLabel();
+        dealsLabel9.setForeground(customColor1); // Set text color
+        dealsLabel9.setFont(new Font("Times new Roman", Font.BOLD, 18)); // Increase font size
+        dealsLabel9.setBounds(250, 75, 500, 20);
+        Panel11.add(dealsLabel9);
+
+        String text9 = "<<<     MOBILE DEALS FOR YOU !!     >>>                    ";
+        int repeatCount9 = 150; // Set the number of times the typewriter effect should repeat
+        Timer typeWriterTimer9 = new Timer(150, new ActionListener() {
+            int index = 0;
+            int count = 0;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (count < repeatCount9) {
+                    if (index <= text9.length()) {
+                        dealsLabel9.setText(text9.substring(0, index));
+                        index++;
+                    } else {
+                        index = 0;
+                        count++;
+                    }
+                } else {
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        });
+        typeWriterTimer9.start();
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQEZq4sBi4QkMA/feedshare-shrink_800/0/1701597896169?e=1704326400&v=beta&t=V44dI_6pk8pC1rRNAJjdA0EL3-Iph1E0rMNCiX_nRMU");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel_l1 = new JLabel(imageIcon);
+            imageLabel_l1.setBounds(80, 115, 70, 90);
+            Panel4.add(imageLabel_l1);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQF2VsdNjX490Q/feedshare-shrink_800/0/1701276420508?e=1704326400&v=beta&t=KeHnQHXR86Pv8uUiDdOi-xHRB_kRKaUN6CDGO9uLlnc");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel_l2 = new JLabel(imageIcon);
+            imageLabel_l2.setBounds(180, 115, 70, 90);
+            Panel4.add(imageLabel_l2);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQHEJFYhqRpWsw/feedshare-shrink_800/0/1701597899346?e=1704326400&v=beta&t=Ks8KZZ7NVA8Zo4RZTSPHeRQIZzV4KIusx9h-zXeipeU");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel_l4 = new JLabel(imageIcon);
+            imageLabel_l4.setBounds(280, 115, 70, 90);
+            Panel4.add(imageLabel_l4);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQFA-LEcfSri2Q/feedshare-shrink_800/0/1701597900778?e=1704326400&v=beta&t=-hJIBngZs-0mYLBrWiFFD4AEiy_HPyL3-wPOuNsZFIg");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel_l5 = new JLabel(imageIcon);
+            imageLabel_l5.setBounds(380, 115, 70, 90);
+            Panel4.add(imageLabel_l5);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQERn1zkWG0OuQ/feedshare-shrink_800/0/1701597898898?e=1704326400&v=beta&t=JDh8RHGUfx59VDCrWp2Nu-FdUp51DPKTXhtMlcky_KM");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel_l6 = new JLabel(imageIcon);
+            imageLabel_l6.setBounds(480, 115, 70, 90);
+            Panel4.add(imageLabel_l6);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQFR0hfyFWK9Uw/feedshare-shrink_800/0/1701597899240?e=1704326400&v=beta&t=hxOss1zdrtaiweJ3A0ean81Ewc-5oMGAckaG-8CvcqI");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel_l7 = new JLabel(imageIcon);
+            imageLabel_l7.setBounds(580, 115, 70, 90);
+            Panel4.add(imageLabel_l7);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        try {
+            URL imageUrl = new URL("https://media.licdn.com/dms/image/D5622AQFX__AUarYI1w/feedshare-shrink_800/0/1701597902340?e=1704326400&v=beta&t=G-jhqFb0vlDl0Iijdx34ZqS1Zi2fKf5tTnnSquXzAlQ");
+            ImageIcon imageIcon = new ImageIcon(imageUrl);
+            imageLabel_l8 = new JLabel(imageIcon);
+            imageLabel_l8.setBounds(680, 115, 70, 90);
+            Panel4.add(imageLabel_l8);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading image from URL: " + e.getMessage());
+        }
+
+        // Add slide show gallery
+        startSlideshow(); // Start the slideshow
+
+        // Left arrow button
+        JButton leftArrowButton = new JButton("<");
+        leftArrowButton.setBounds(15, 325, 25, 25);
+        leftArrowButton.setFont(new Font("Calibra", Font.BOLD, 15));
+        leftArrowButton.setEnabled(true);
+        leftArrowButton.setBackground(customColor2);
+        leftArrowButton.setForeground(Color.black);
+        leftArrowButton.setBorder(BorderFactory.createLineBorder(Color.BLACK, 4)); // Add border
+
+        leftArrowButton.addActionListener(e -> changeSlide(false)); // Change to the previous slide
+        Panel4.add(leftArrowButton);
+
+        // Right arrow button
+        JButton rightArrowButton = new JButton(">");
+        rightArrowButton.setBounds(770, 325, 25, 25);
+        rightArrowButton.setFont(new Font("Calibra", Font.BOLD, 14));
+        //rightArrowButton.setForeground(Color.BLACK);
+        rightArrowButton.setBackground(customColor2);
+        rightArrowButton.setForeground(Color.black);
+        rightArrowButton.setEnabled(true);
+        rightArrowButton.setBorder(BorderFactory.createLineBorder(Color.black, 4)); // Add border
+        rightArrowButton.addActionListener(e -> changeSlide(true)); // Change to the next slide
+        Panel4.add(rightArrowButton);
+
+        // My Account Text with Emoji
+        JLabel myAccountLabel = new JLabel("My Account 👤"); // Emoji: 👤
+        myAccountLabel.setBounds(620, 10, 82, 30); // Adjust the bounds as needed
+        myAccountLabel.setForeground(Color.white);
+        myAccountLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myAccountLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Account");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                myAccountLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myAccountLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(myAccountLabel);
+
+        // My Cart Text with Emoji
+        JLabel myCartLabel = new JLabel("My Cart 🛒"); // Emoji: 🛒
+        myCartLabel.setBounds(720, 10, 60, 30); // Adjust the bounds as needed
+        myCartLabel.setForeground(Color.WHITE);
+        myCartLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myCartLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Cart
+                System.out.println("\nClicked on My Cart");
+
+                // Create a new frame for the cart
+                JFrame cartFrame = new JFrame("My Cart");
+                cartFrame.setSize(800, 600);
+                cartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+                // Create a new panel for the cart
+                JPanel cartPanel = new JPanel(new GridLayout(0, 2, 10, 10));
+                cartPanel.setBackground(Color.black);
+
+                // Display the products on the cart panel
+                displayPayment(cartPanel, currentPage);
+
+                // Add the cartPanel to the cartFrame
+                cartFrame.getContentPane().add(cartPanel);
+                cartFrame.setLocationRelativeTo(null);
+                cartFrame.setVisible(true);
+
+                // Visual feedback
+                myCartLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myCartLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(myCartLabel);
+
+        /* // Application Logo Image (Placeholder) - Added near the title bar
+        JLabel logoLabel2 = new JLabel(logoIcon2);
+        logoLabel2.setBounds(0, 10, 100, 50); // Adjust the bounds as needed
+        Panel5.add(logoLabel2);*/
+        // My Account Text with Emoji
+        JLabel myAccountLabel2 = new JLabel("My Account 👤"); // Emoji: 👤
+        myAccountLabel2.setBounds(620, 10, 82, 30); // Adjust the bounds as needed
+        myAccountLabel2.setForeground(Color.white);
+        myAccountLabel2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myAccountLabel2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Account");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                myAccountLabel2.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myAccountLabel2.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel5.add(myAccountLabel2);
+
+        // My Cart Text with Emoji
+        JLabel myCartLabel2 = new JLabel("My Cart 🛒"); // Emoji: 🛒
+        myCartLabel2.setBounds(720, 10, 60, 30); // Adjust the bounds as needed
+        myCartLabel2.setForeground(Color.WHITE);
+        myCartLabel2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myCartLabel2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Cart
+                System.out.println("\nClicked on My Cart");
+                // Add your action here, like opening the cart
+
+                // Create a new frame for the cart
+                JFrame cartFrame = new JFrame("My Cart");
+                cartFrame.setSize(800, 600);
+                cartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+                // Create a new panel for the cart
+                JPanel cartPanel = new JPanel(new GridLayout(0, 2, 10, 10));
+                cartPanel.setBackground(Color.black);
+
+                // Display the products on the cart panel
+                displayPayment(cartPanel, currentPage);
+
+                // Add the cartPanel to the cartFrame
+                cartFrame.getContentPane().add(cartPanel);
+                cartFrame.setLocationRelativeTo(null);
+                cartFrame.setVisible(true);
+
+                // Visual feedback
+                myCartLabel2.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myCartLabel2.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel5.add(myCartLabel2);
+
+        // Search Bar
+        JTextField searchField2 = new JTextField();
+        searchField2.setBounds(140, 15, 380, 30); // Adjust the bounds as needed
+        searchField2.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchField2.setForeground(Color.BLACK); // Set the text color
+        searchField2.setBorder(BorderFactory.createLineBorder(Color.GRAY)); // Set border color (optional)
+        JButton searchButton2 = new JButton("🔍");
+        searchButton2.setBounds(520, 15, 47, 30); // Adjust the bounds as needed
+        searchButton2.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchButton2.setForeground(Color.BLACK); // Set the text color
+        // searchButton2.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+        searchButton2.addActionListener(e -> {
+            String searchText = searchField2.getText().toLowerCase(); // Get the entered text
+
+            // Fetch products based on the entered text
+            List<String> searchedProductIDs = fetchProductIDsFromDatabase(searchText);
+
+            if (searchedProductIDs.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Product not found!");
+            } else {
+                // Fetch products based on the retrieved IDs
+                List<Product> searchedProducts = fetchProductsFromDatabase(searchedProductIDs);
+
+                // Open a new window displaying the details of the first product found
+                new ProductDetailsGUI(searchedProducts.get(0));
+            }
+        });
+
+        // Adding focus listener to hide/show text
+        searchField2.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (searchField2.getText().equals("Search in Trove")) {
+                    searchField2.setText("");
+                    searchField2.setForeground(Color.BLACK); // Change text color to black
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (searchField2.getText().isEmpty()) {
+                    searchField2.setForeground(Color.GRAY); // Set text color back to gray
+                    searchField2.setText("Search in Trove");
+                }
+            }
+        });
+
+        Panel5.add(searchField2);
+        Panel5.add(searchButton2);
+
+        /* // Application Logo Image (Placeholder) - Added near the title bar
+        JLabel logoLabel3 = new JLabel(logoIcon3);
+        logoLabel3.setBounds(0, 10, 100, 50); // Adjust the bounds as needed
+        Panel6.add(logoLabel3);*/
+        // My Account Text with Emoji
+        JLabel myAccountLabel3 = new JLabel("My Account 👤"); // Emoji: 👤
+        myAccountLabel3.setBounds(620, 10, 82, 30); // Adjust the bounds as needed
+        myAccountLabel3.setForeground(Color.white);
+        myAccountLabel3.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myAccountLabel3.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Account");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                myAccountLabel3.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myAccountLabel3.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel6.add(myAccountLabel3);
+
+        // My Cart Text with Emoji
+        JLabel myCartLabel3 = new JLabel("My Cart 🛒"); // Emoji: 🛒
+        myCartLabel3.setBounds(720, 10, 60, 30); // Adjust the bounds as needed
+        myCartLabel3.setForeground(Color.WHITE);
+        myCartLabel3.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myCartLabel3.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Cart
+                System.out.println("\nClicked on My Cart");
+                // Add your action here, like opening the cart
+
+                // Visual feedback
+                myCartLabel3.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myCartLabel3.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel6.add(myCartLabel3);
+
+        // Search Bar
+        JTextField searchField3 = new JTextField();
+        searchField3.setBounds(140, 15, 380, 30); // Adjust the bounds as needed
+        searchField3.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchField3.setForeground(Color.BLACK); // Set the text color
+        searchField3.setBorder(BorderFactory.createLineBorder(Color.GRAY)); // Set border color (optional)
+        JButton searchButton3 = new JButton("🔍");
+        searchButton3.setBounds(520, 15, 47, 30); // Adjust the bounds as needed
+        searchButton3.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchButton3.setForeground(Color.BLACK); // Set the text color
+        // searchButton3.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+        searchButton3.addActionListener(e -> {
+            String searchText = searchField3.getText().toLowerCase(); // Get the entered text
+
+            // Fetch products based on the entered text
+            List<String> searchedProductIDs = fetchProductIDsFromDatabase(searchText);
+
+            if (searchedProductIDs.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Product not found!");
+            } else {
+                // Fetch products based on the retrieved IDs
+                List<Product> searchedProducts = fetchProductsFromDatabase(searchedProductIDs);
+
+                // Open a new window displaying the details of the first product found
+                new ProductDetailsGUI(searchedProducts.get(0));
+            }
+        });
+
+        // Adding focus listener to hide/show text
+        searchField3.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (searchField3.getText().equals("Search in Trove")) {
+                    searchField3.setText("");
+                    searchField3.setForeground(Color.BLACK); // Change text color to black
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (searchField3.getText().isEmpty()) {
+                    searchField3.setForeground(Color.GRAY); // Set text color back to gray
+                    searchField3.setText("Search in Trove");
+                }
+            }
+        });
+
+        Panel6.add(searchField3);
+        Panel6.add(searchButton3);
+
+        /* // Application Logo Image (Placeholder) - Added near the title bar
+        JLabel logoLabel4 = new JLabel(logoIcon3);
+        logoLabel4.setBounds(0, 10, 100, 50); // Adjust the bounds as needed
+        Panel7.add(logoLabel4);*/
+        // My Account Text with Emoji
+        JLabel myAccountLabel4 = new JLabel("My Account 👤"); // Emoji: 👤
+        myAccountLabel4.setBounds(620, 10, 82, 30); // Adjust the bounds as needed
+        myAccountLabel4.setForeground(Color.white);
+        myAccountLabel4.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myAccountLabel4.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Account");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                myAccountLabel4.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myAccountLabel4.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel7.add(myAccountLabel4);
+
+        // My Cart Text with Emoji
+        JLabel myCartLabel4 = new JLabel("My Cart 🛒"); // Emoji: 🛒
+        myCartLabel4.setBounds(720, 10, 60, 30); // Adjust the bounds as needed
+        myCartLabel4.setForeground(Color.WHITE);
+        myCartLabel4.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myCartLabel4.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Cart
+                System.out.println("\nClicked on My Cart");
+                // Add your action here, like opening the cart
+                // Visual feedback
+                myCartLabel4.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myCartLabel4.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel7.add(myCartLabel4);
+
+        // Search Bar
+        JTextField searchField4 = new JTextField();
+        searchField4.setBounds(140, 15, 380, 30); // Adjust the bounds as needed
+        searchField4.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchField4.setForeground(Color.BLACK); // Set the text color
+        searchField4.setBorder(BorderFactory.createLineBorder(Color.GRAY)); // Set border color (optional)
+        JButton searchButton4 = new JButton("🔍");
+        searchButton4.setBounds(520, 15, 47, 30); // Adjust the bounds as needed
+        searchButton4.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchButton4.setForeground(Color.BLACK); // Set the text color
+        // searchButton4.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+        searchButton4.addActionListener(e -> {
+            String searchText = searchField4.getText().toLowerCase(); // Get the entered text
+
+            // Fetch products based on the entered text
+            List<String> searchedProductIDs = fetchProductIDsFromDatabase(searchText);
+
+            if (searchedProductIDs.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Product not found!");
+            } else {
+                // Fetch products based on the retrieved IDs
+                List<Product> searchedProducts = fetchProductsFromDatabase(searchedProductIDs);
+
+                // Open a new window displaying the details of the first product found
+                new ProductDetailsGUI(searchedProducts.get(0));
+            }
+        });
+
+        // Adding focus listener to hide/show text
+        searchField4.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (searchField4.getText().equals("Search in Trove")) {
+                    searchField4.setText("");
+                    searchField4.setForeground(Color.BLACK); // Change text color to black
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (searchField4.getText().isEmpty()) {
+                    searchField4.setForeground(Color.GRAY); // Set text color back to gray
+                    searchField4.setText("Search in Trove");
+                }
+            }
+        });
+
+        Panel7.add(searchField4);
+        Panel7.add(searchButton4);
+
+        /// ************* PANEL 8 CATEGORY - GROCERY ***************     
+        // My Account Text with Emoji
+        JLabel myAccountLabel5 = new JLabel("My Account 👤"); // Emoji: 👤
+        myAccountLabel5.setBounds(620, 10, 82, 30); // Adjust the bounds as needed
+        myAccountLabel5.setForeground(Color.white);
+        myAccountLabel5.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myAccountLabel5.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Account");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                myAccountLabel5.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myAccountLabel5.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel8.add(myAccountLabel5);
+
+        // My Cart Text with Emoji
+        JLabel myCartLabel5 = new JLabel("My Cart 🛒"); // Emoji: 🛒
+        myCartLabel5.setBounds(720, 10, 60, 30); // Adjust the bounds as needed
+        myCartLabel5.setForeground(Color.WHITE);
+        myCartLabel5.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myCartLabel5.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Cart
+                System.out.println("\nClicked on My Cart");
+                // Add your action here, like opening the cart
+                // Visual feedback
+                myCartLabel5.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myCartLabel5.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel8.add(myCartLabel5);
+
+        // Search Bar
+        JTextField searchField5 = new JTextField();
+        searchField5.setBounds(140, 15, 380, 30); // Adjust the bounds as needed
+        searchField5.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchField5.setForeground(Color.BLACK); // Set the text color
+        searchField5.setBorder(BorderFactory.createLineBorder(Color.GRAY)); // Set border color (optional)
+        JButton searchButton5 = new JButton("🔍");
+        searchButton5.setBounds(520, 15, 47, 30); // Adjust the bounds as needed
+        searchButton5.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchButton5.setForeground(Color.BLACK); // Set the text color
+        // searchButton5.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+        searchButton5.addActionListener(e -> {
+            String searchText = searchField5.getText().toLowerCase(); // Get the entered text
+
+            // Fetch products based on the entered text
+            List<String> searchedProductIDs = fetchProductIDsFromDatabase(searchText);
+
+            if (searchedProductIDs.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Product not found!");
+            } else {
+                // Fetch products based on the retrieved IDs
+                List<Product> searchedProducts = fetchProductsFromDatabase(searchedProductIDs);
+
+                // Open a new window displaying the details of the first product found
+                new ProductDetailsGUI(searchedProducts.get(0));
+            }
+        });
+
+        // Adding focus listener to hide/show text
+        searchField5.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (searchField5.getText().equals("Search in Trove")) {
+                    searchField5.setText("");
+                    searchField5.setForeground(Color.BLACK); // Change text color to black
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (searchField5.getText().isEmpty()) {
+                    searchField5.setForeground(Color.GRAY); // Set text color back to gray
+                    searchField5.setText("Search in Trove");
+                }
+            }
+        });
+
+        Panel8.add(searchField5);
+        Panel8.add(searchButton5);
+
+        /// ************* PANEL 9 CATEGORY - GROCERY 2 ***************     
+        // My Account Text with Emoji
+        JLabel myAccountLabel6 = new JLabel("My Account 👤"); // Emoji: 👤
+        myAccountLabel6.setBounds(620, 10, 82, 30); // Adjust the bounds as needed
+        myAccountLabel6.setForeground(Color.white);
+        myAccountLabel6.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myAccountLabel6.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Account");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                myAccountLabel6.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myAccountLabel6.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel9.add(myAccountLabel6);
+
+        // My Cart Text with Emoji
+        JLabel myCartLabel6 = new JLabel("My Cart 🛒"); // Emoji: 🛒
+        myCartLabel6.setBounds(720, 10, 60, 30); // Adjust the bounds as needed
+        myCartLabel6.setForeground(Color.WHITE);
+        myCartLabel6.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myCartLabel6.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Cart
+                System.out.println("\nClicked on My Cart");
+                // Add your action here, like opening the cart
+                // Visual feedback
+                myCartLabel6.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myCartLabel6.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel9.add(myCartLabel6);
+
+        // Search Bar
+        JTextField searchField6 = new JTextField();
+        searchField6.setBounds(140, 15, 380, 30); // Adjust the bounds as needed
+        searchField6.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchField6.setForeground(Color.BLACK); // Set the text color
+        searchField6.setBorder(BorderFactory.createLineBorder(Color.GRAY)); // Set border color (optional)
+        JButton searchButton6 = new JButton("🔍");
+        searchButton6.setBounds(520, 15, 47, 30); // Adjust the bounds as needed
+        searchButton6.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchButton6.setForeground(Color.BLACK); // Set the text color
+        // searchButton6.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+        searchButton6.addActionListener(e -> {
+            String searchText = searchField6.getText().toLowerCase(); // Get the entered text
+
+            // Fetch products based on the entered text
+            List<String> searchedProductIDs = fetchProductIDsFromDatabase(searchText);
+
+            if (searchedProductIDs.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Product not found!");
+            } else {
+                // Fetch products based on the retrieved IDs
+                List<Product> searchedProducts = fetchProductsFromDatabase(searchedProductIDs);
+
+                // Open a new window displaying the details of the first product found
+                new ProductDetailsGUI(searchedProducts.get(0));
+            }
+        });
+
+        // Adding focus listener to hide/show text
+        searchField6.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (searchField6.getText().equals("Search in Trove")) {
+                    searchField6.setText("");
+                    searchField6.setForeground(Color.BLACK); // Change text color to black
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (searchField6.getText().isEmpty()) {
+                    searchField6.setForeground(Color.GRAY); // Set text color back to gray
+                    searchField6.setText("Search in Trove");
+                }
+            }
+        });
+
+        Panel9.add(searchField6);
+        Panel9.add(searchButton6);
+
+        // Category Grocery Text with Emoji
+        JLabel groceryLabel = new JLabel("Grocery 🥕");
+        groceryLabel.setBounds(85, 200, 62, 30); // Adjust the bounds as needed
+        groceryLabel.setForeground(Color.white);
+        groceryLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        groceryLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Grocery");
+                remove(Panel4);
+                add(Panel8, BorderLayout.CENTER);
+                setTitle("TROVE CART - GROCERY DEALS PAGE 1");
+                revalidate();
+                repaint();
+
+                // Visual feedback
+                groceryLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> groceryLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(groceryLabel);
+
+        /// ************* PANEL 10 CATEGORY - MOBILE 1 ***************     
+        // My Account Text with Emoji
+        JLabel myAccountLabel7 = new JLabel("My Account 👤"); // Emoji: 👤
+        myAccountLabel7.setBounds(620, 10, 82, 30); // Adjust the bounds as needed
+        myAccountLabel7.setForeground(Color.white);
+        myAccountLabel7.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myAccountLabel7.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Account");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                myAccountLabel7.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myAccountLabel7.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel10.add(myAccountLabel7);
+
+        // My Cart Text with Emoji
+        JLabel myCartLabel7 = new JLabel("My Cart 🛒"); // Emoji: 🛒
+        myCartLabel7.setBounds(720, 10, 60, 30); // Adjust the bounds as needed
+        myCartLabel7.setForeground(Color.WHITE);
+        myCartLabel7.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myCartLabel7.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Cart
+                System.out.println("\nClicked on My Cart");
+                // Add your action here, like opening the cart
+                // Visual feedback
+                myCartLabel7.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myCartLabel7.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel10.add(myCartLabel7);
+
+        // Search Bar
+        JTextField searchField7 = new JTextField();
+        searchField7.setBounds(140, 15, 380, 30); // Adjust the bounds as needed
+        searchField7.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchField7.setForeground(Color.BLACK); // Set the text color
+        searchField7.setBorder(BorderFactory.createLineBorder(Color.GRAY)); // Set border color (optional)
+        JButton searchButton7 = new JButton("🔍");
+        searchButton7.setBounds(520, 15, 47, 30); // Adjust the bounds as needed
+        searchButton7.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchButton7.setForeground(Color.BLACK); // Set the text color
+        // searchButton7.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+        searchButton7.addActionListener(e -> {
+            String searchText = searchField7.getText().toLowerCase(); // Get the entered text
+
+            // Fetch products based on the entered text
+            List<String> searchedProductIDs = fetchProductIDsFromDatabase(searchText);
+
+            if (searchedProductIDs.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Product not found!");
+            } else {
+                // Fetch products based on the retrieved IDs
+                List<Product> searchedProducts = fetchProductsFromDatabase(searchedProductIDs);
+
+                // Open a new window displaying the details of the first product found
+                new ProductDetailsGUI(searchedProducts.get(0));
+            }
+        });
+
+        // Adding focus listener to hide/show text
+        searchField7.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (searchField7.getText().equals("Search in Trove")) {
+                    searchField7.setText("");
+                    searchField7.setForeground(Color.BLACK); // Change text color to black
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (searchField7.getText().isEmpty()) {
+                    searchField7.setForeground(Color.GRAY); // Set text color back to gray
+                    searchField7.setText("Search in Trove");
+                }
+            }
+        });
+
+        Panel10.add(searchField7);
+        Panel10.add(searchButton7);
+
+        /// ************* PANEL 11 CATEGORY - MOBILE 2 ***************     
+        // My Account Text with Emoji
+        JLabel myAccountLabel8 = new JLabel("My Account 👤"); // Emoji: 👤
+        myAccountLabel8.setBounds(620, 10, 82, 30); // Adjust the bounds as needed
+        myAccountLabel8.setForeground(Color.white);
+        myAccountLabel8.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myAccountLabel8.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Account");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                myAccountLabel8.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myAccountLabel8.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel11.add(myAccountLabel8);
+
+        // My Cart Text with Emoji
+        JLabel myCartLabel8 = new JLabel("My Cart 🛒"); // Emoji: 🛒
+        myCartLabel8.setBounds(720, 10, 60, 30); // Adjust the bounds as needed
+        myCartLabel8.setForeground(Color.WHITE);
+        myCartLabel8.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        myCartLabel8.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Cart
+                System.out.println("\nClicked on My Cart");
+                // Add your action here, like opening the cart
+                // Visual feedback
+                myCartLabel8.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> myCartLabel8.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel11.add(myCartLabel8);
+
+        // Search Bar
+        JTextField searchField8 = new JTextField();
+        searchField8.setBounds(140, 15, 380, 30); // Adjust the bounds as needed
+        searchField8.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchField8.setForeground(Color.BLACK); // Set the text color
+        searchField8.setBorder(BorderFactory.createLineBorder(Color.GRAY)); // Set border color (optional)
+        JButton searchButton8 = new JButton("🔍");
+        searchButton8.setBounds(520, 15, 47, 30); // Adjust the bounds as needed
+        searchButton8.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchButton8.setForeground(Color.BLACK); // Set the text color
+        // searchButton8.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+        searchButton8.addActionListener(e -> {
+            String searchText = searchField8.getText().toLowerCase(); // Get the entered text
+
+            // Fetch products based on the entered text
+            List<String> searchedProductIDs = fetchProductIDsFromDatabase(searchText);
+
+            if (searchedProductIDs.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Product not found!");
+            } else {
+                // Fetch products based on the retrieved IDs
+                List<Product> searchedProducts = fetchProductsFromDatabase(searchedProductIDs);
+
+                // Open a new window displaying the details of the first product found
+                new ProductDetailsGUI(searchedProducts.get(0));
+            }
+        });
+
+        // Adding focus listener to hide/show text
+        searchField8.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (searchField8.getText().equals("Search in Trove")) {
+                    searchField8.setText("");
+                    searchField8.setForeground(Color.BLACK); // Change text color to black
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (searchField8.getText().isEmpty()) {
+                    searchField8.setForeground(Color.GRAY); // Set text color back to gray
+                    searchField8.setText("Search in Trove");
+                }
+            }
+        });
+
+        Panel11.add(searchField8);
+        Panel11.add(searchButton8);
+
+        // Category Mobiles Text with Emoji
+        JLabel mobileLabel = new JLabel("Mobile 📱");
+        mobileLabel.setBounds(192, 200, 54, 30); // Adjust the bounds as needed
+        mobileLabel.setForeground(Color.white);
+        mobileLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        mobileLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Mobiles");
+                remove(Panel4);
+                add(Panel10, BorderLayout.CENTER);
+                setTitle("TROVE CART - MOBILE DEAL PAGE 1");
+                revalidate();
+                repaint();
+
+                // Visual feedback
+                mobileLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> mobileLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(mobileLabel);
+
+        // Category Mens Fashion Text with Emoji
+        JLabel mensFashionLabel = new JLabel("Men 👕");
+        mensFashionLabel.setBounds(297, 200, 40, 30); // Adjust the bounds as needed
+        mensFashionLabel.setForeground(Color.white);
+        mensFashionLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        mensFashionLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Mens Fashion");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                mensFashionLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> mensFashionLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(mensFashionLabel);
+
+        // Category Mens Fashion Text with Emoji
+        JLabel womensFashionLabel = new JLabel("Womens 👗");
+        womensFashionLabel.setBounds(385, 200, 70, 30); // Adjust the bounds as needed
+        womensFashionLabel.setForeground(Color.white);
+        womensFashionLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        womensFashionLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Womens Fashion");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                womensFashionLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> womensFashionLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(womensFashionLabel);
+
+        // Category Mens Fashion Text with Emoji
+        JLabel electronicLabel = new JLabel("Electronics 🔌");
+        electronicLabel.setBounds(480, 200, 80, 30); // Adjust the bounds as needed
+        electronicLabel.setForeground(Color.white);
+        electronicLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        electronicLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Electronics");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                electronicLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> electronicLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(electronicLabel);
+
+        // Category Mens Fashion Text with Emoji
+        JLabel beautyLabel = new JLabel("Beauty ✨"); //Beauty
+        beautyLabel.setBounds(588, 200, 70, 30); // Adjust the bounds as needed
+        beautyLabel.setForeground(Color.white);
+        beautyLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        beautyLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Beauty");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                beautyLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> beautyLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(beautyLabel);
+
+        // Category Mens Fashion Text with Emoji
+        JLabel kidsLabel = new JLabel("Kids 🎮"); //Kids
+        kidsLabel.setBounds(690, 200, 70, 30); // Adjust the bounds as needed
+        kidsLabel.setForeground(Color.white);
+        kidsLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        kidsLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Perform action for My Account
+                System.out.println("\nClicked on My Kids");
+                // Add your action here, like opening the account settings
+
+                // Visual feedback
+                kidsLabel.setForeground(customColor1); // Change color momentarily
+                Timer timer = new Timer(200, actionEvent -> kidsLabel.setForeground(Color.white));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+        Panel4.add(kidsLabel);
+
+        // Search Bar
+        JTextField searchField = new JTextField();
+        searchField.setBounds(140, 15, 380, 30); // Adjust the bounds as needed
+        searchField.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchField.setForeground(Color.BLACK); // Set the text color
+        searchField.setBorder(BorderFactory.createLineBorder(Color.GRAY)); // Set border color (optional)
+        JButton searchButton = new JButton("🔍");
+        searchButton.setBounds(520, 15, 47, 30); // Adjust the bounds as needed
+        searchButton.setBackground(Color.LIGHT_GRAY); // Set the background color
+        searchButton.setForeground(Color.BLACK); // Set the text color
+        // searchButton.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+        searchButton.addActionListener(e -> {
+            String searchText = searchField.getText().toLowerCase(); // Get the entered text
+
+            // Fetch products based on the entered text
+            List<String> searchedProductIDs = fetchProductIDsFromDatabase(searchText);
+
+            if (searchedProductIDs.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Product not found!");
+            } else {
+                // Fetch products based on the retrieved IDs
+                List<Product> searchedProducts = fetchProductsFromDatabase(searchedProductIDs);
+
+                // Open a new window displaying the details of the first product found
+                new ProductDetailsGUI(searchedProducts.get(0));
+            }
+        });
+
+        // Adding focus listener to hide/show text
+        searchField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (searchField.getText().equals("Search in Trove")) {
+                    searchField.setText("");
+                    searchField.setForeground(Color.BLACK); // Change text color to black
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (searchField.getText().isEmpty()) {
+                    searchField.setForeground(Color.GRAY); // Set text color back to gray
+                    searchField.setText("Search in Trove");
+                }
+            }
+        });
+
+        Panel4.add(searchField);
+        Panel4.add(searchButton);
+
+// **************** PRODUCTS LISTING METHODS STARTS ************************   
+        // Define the list of product IDs you want to fetch
+        java.util.List<String> specificProductIDs1 = new ArrayList<>();
+        specificProductIDs1.add("1047");
+        specificProductIDs1.add("1014");
+        //specificProductIDs1.add("1004");
+
+        // Add more product IDs as needed
+        // Fetch products based on specific IDs
+        products1 = fetchProductsFromDatabase(specificProductIDs1);
+        // Rest of your code remains the same...
+        cart1 = new ArrayList<>();
+
+        JPanel productsPanel = new JPanel(new GridLayout(0 /*rows*/, 2 /*columns*/, 10 /*Horizontal space */, 10 /*Vertical space */)); // GridLayout for products
+        productsPanel.setBackground(Color.black);
+        productsPanel.setBounds(15, 490, 770, 155);
+
+        displayProducts(productsPanel, currentPage);
+        Panel4.add(productsPanel);
+        setLocationRelativeTo(null);
+
+        JButton backButton = new JButton("Back");
+        backButton.setBounds(290, 653, 100, 30);
+        backButton.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        backButton.setForeground(Color.BLACK);
+        backButton.setBackground(customColor1);
+        backButton.setEnabled(true);
+        backButton.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+
+        backButton.addActionListener(new BackButtonActionListener());
+        Panel4.add(backButton);
+
+        JButton nextButton = new JButton("Next");
+        nextButton.setBounds(415, 653, 100, 30);
+        nextButton.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        nextButton.setForeground(Color.BLACK);
+        nextButton.setBackground(customColor1);
+        nextButton.setEnabled(true);
+        nextButton.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+        nextButton.addActionListener(new NextButtonActionListener());
+        Panel4.add(nextButton);
+
+        currentPage = 0;
+
+        setVisible(true);
+
+        // ************ PANEL 5 ********************   
+        // Define the list of product IDs you want to fetch
+        java.util.List<String> specificProductIDs2 = new ArrayList<>();
+        specificProductIDs2.add("1068");
+        specificProductIDs2.add("1069");
+        specificProductIDs2.add("1070");
+        specificProductIDs2.add("1071");
+        specificProductIDs2.add("1072");
+        specificProductIDs2.add("1067");
+        // specificProductIDs2.add("1009");
+        // specificProductIDs2.add("1009");
+
+        // Add more product IDs as needed
+        // Fetch products based on specific IDs
+        products2 = fetchProductsFromDatabase2(specificProductIDs2);
+        // Rest of your code remains the same...
+        cart2 = new ArrayList<>();
+
+        JPanel productsPanel2 = new JPanel(new GridLayout(0 /*rows*/, 2 /*columns*/, 5 /*Horizontal space */, 5 /*Vertical space */)); // GridLayout for products
+        productsPanel2.setBackground(Color.black);
+        productsPanel2.setBounds(25, 115, 770, 500);
+
+        displayProducts2(productsPanel2, currentPage);
+        Panel5.add(productsPanel2);
+        // getContentPane().add(Panel5, BorderLayout.CENTER);
+        setLocationRelativeTo(null);
+
+        JButton backButton2 = new JButton("Back");
+        backButton2.setBounds(290, 653, 100, 30);
+        backButton2.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        backButton2.setForeground(Color.BLACK);
+        backButton2.setBackground(customColor1);
+        backButton2.setEnabled(true);
+        backButton2.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+
+        backButton2.addActionListener(new BackButton2ActionListener());
+        Panel5.add(backButton2);
+
+        JButton nextButton2 = new JButton("Next");
+        nextButton2.setBounds(415, 653, 100, 30);
+        nextButton2.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        nextButton2.setForeground(Color.BLACK);
+        nextButton2.setBackground(customColor1);
+        nextButton2.setEnabled(true);
+        nextButton2.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+        nextButton2.addActionListener(new NextButton2ActionListener());
+        Panel5.add(nextButton2);
+
+        currentPage = 0;
+
+        //add(Panel5);
+        setVisible(true);
+
+        // ************ PANEL 6 ********************   
+        // Define the list of product IDs you want to fetch
+        java.util.List<String> specificProductIDs3 = new ArrayList<>();
+        specificProductIDs3.add("1050");
+        specificProductIDs3.add("1026");
+        specificProductIDs3.add("1036");
+        specificProductIDs3.add("1071");
+        specificProductIDs3.add("1064");
+        specificProductIDs3.add("1059");
+        // specificProductIDs2.add("1009");
+        // specificProductIDs2.add("1009");
+
+        // Add more product IDs as needed
+        // Fetch products based on specific IDs
+        products3 = fetchProductsFromDatabase3(specificProductIDs3);
+        // Rest of your code remains the same...
+        cart3 = new ArrayList<>();
+
+        JPanel productsPanel3 = new JPanel(new GridLayout(0 /*rows*/, 2 /*columns*/, 5 /*Horizontal space */, 5 /*Vertical space */)); // GridLayout for products
+        productsPanel3.setBackground(Color.black);
+        productsPanel3.setBounds(25, 115, 770, 500);
+
+        displayProducts3(productsPanel3, currentPage);
+        Panel6.add(productsPanel3);
+        // getContentPane().add(Panel6, BorderLayout.CENTER);
+        setLocationRelativeTo(null);
+
+        JButton backButton3 = new JButton("Back");
+        backButton3.setBounds(290, 653, 100, 30);
+        backButton3.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        backButton3.setForeground(Color.BLACK);
+        backButton3.setBackground(customColor1);
+        backButton3.setEnabled(true);
+        backButton3.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+
+        backButton3.addActionListener(new BackButton3ActionListener());
+        Panel6.add(backButton3);
+
+        JButton nextButton3 = new JButton("Next");
+        nextButton3.setBounds(415, 653, 100, 30);
+        nextButton3.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        nextButton3.setForeground(Color.BLACK);
+        nextButton3.setBackground(customColor1);
+        nextButton3.setEnabled(true);
+        nextButton3.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+        nextButton3.addActionListener(new NextButton3ActionListener());
+        Panel6.add(nextButton3);
+
+        currentPage = 0;
+
+        //add(Panel5);
+        setVisible(true);
+
+        // ************ PANEL 7 ********************   
+        // Define the list of product IDs you want to fetch
+        java.util.List<String> specificProductIDs4 = new ArrayList<>();
+        specificProductIDs4.add("1048");
+        specificProductIDs4.add("1064");
+        specificProductIDs4.add("1041");
+        specificProductIDs4.add("1065");
+        specificProductIDs4.add("1035");
+        specificProductIDs4.add("1038");
+        // specificProductIDs4.add("1009");
+        // specificProductIDs4.add("1009");
+
+        // Add more product IDs as needed
+        // Fetch products based on specific IDs
+        products4 = fetchProductsFromDatabase4(specificProductIDs4);
+        // Rest of your code remains the same...
+        cart4 = new ArrayList<>();
+
+        JPanel productsPanel4 = new JPanel(new GridLayout(0 /*rows*/, 2 /*columns*/, 5 /*Horizontal space */, 5 /*Vertical space */)); // GridLayout for products
+        productsPanel4.setBackground(Color.black);
+        productsPanel4.setBounds(25, 115, 770, 500);
+
+        displayProducts4(productsPanel4, currentPage);
+        Panel7.add(productsPanel4);
+        // getContentPane().add(Panel6, BorderLayout.CENTER);
+        setLocationRelativeTo(null);
+
+        JButton backButton4 = new JButton("Back");
+        backButton4.setBounds(290, 653, 100, 30);
+        backButton4.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        backButton4.setForeground(Color.BLACK);
+        backButton4.setBackground(customColor1);
+        backButton4.setEnabled(true);
+        backButton4.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+
+        backButton4.addActionListener(new BackButton4ActionListener());
+        Panel7.add(backButton4);
+
+        JButton nextButton4 = new JButton("Next");
+        nextButton4.setBounds(415, 653, 100, 30);
+        nextButton4.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        nextButton4.setForeground(Color.BLACK);
+        nextButton4.setBackground(customColor1);
+        nextButton4.setEnabled(true);
+        nextButton4.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+        nextButton4.addActionListener(new NextButton4ActionListener());
+        Panel7.add(nextButton4);
+
+        currentPage = 0;
+
+        //add(Panel7);
+        setVisible(true);
+
+        // ************ PANEL 8 ********************   
+        // Define the list of product IDs you want to fetch
+        java.util.List<String> specificProductIDs5 = new ArrayList<>();
+        specificProductIDs5.add("1002");
+        specificProductIDs5.add("1003");
+        specificProductIDs5.add("1004");
+        specificProductIDs5.add("1005");
+        specificProductIDs5.add("1006");
+        specificProductIDs5.add("1007");
+        // specificProductIDs4.add("1009");
+        // specificProductIDs4.add("1009");
+
+        // Add more product IDs as needed
+        // Fetch products based on specific IDs
+        products5 = fetchProductsFromDatabase5(specificProductIDs5);
+        // Rest of your code remains the same...
+        cart5 = new ArrayList<>();
+
+        JPanel productsPanel5 = new JPanel(new GridLayout(0 /*rows*/, 2 /*columns*/, 5 /*Horizontal space */, 5 /*Vertical space */)); // GridLayout for products
+        productsPanel5.setBackground(Color.black);
+        productsPanel5.setBounds(25, 115, 770, 500);
+
+        displayProducts5(productsPanel5, currentPage);
+        Panel8.add(productsPanel5);
+        // getContentPane().add(Panel6, BorderLayout.CENTER);
+        setLocationRelativeTo(null);
+
+        JButton backButton5 = new JButton("Back");
+        backButton5.setBounds(290, 653, 100, 30);
+        backButton5.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        backButton5.setForeground(Color.BLACK);
+        backButton5.setBackground(customColor1);
+        backButton5.setEnabled(true);
+        backButton5.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+
+        backButton5.addActionListener(new BackButton5ActionListener());
+        Panel8.add(backButton5);
+
+        JButton nextButton5 = new JButton("Next");
+        nextButton5.setBounds(415, 653, 100, 30);
+        nextButton5.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        nextButton5.setForeground(Color.BLACK);
+        nextButton5.setBackground(customColor1);
+        nextButton5.setEnabled(true);
+        nextButton5.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+        nextButton5.addActionListener(new NextButton5ActionListener());
+        Panel8.add(nextButton5);
+
+        currentPage = 0;
+
+        //add(Panel7);
+        setVisible(true);
+
+        // ************ PANEL 9 ********************   
+        // Define the list of product IDs you want to fetch
+        java.util.List<String> specificProductIDs6 = new ArrayList<>();
+        specificProductIDs6.add("1008");
+        specificProductIDs6.add("1009");
+        specificProductIDs6.add("1010");
+        specificProductIDs6.add("1011");
+        specificProductIDs6.add("1012");
+        specificProductIDs6.add("1006");
+        // specificProductIDs4.add("1009");
+        // specificProductIDs4.add("1009");
+
+        // Add more product IDs as needed
+        // Fetch products based on specific IDs
+        products6 = fetchProductsFromDatabase6(specificProductIDs6);
+        // Rest of your code remains the same...
+        cart6 = new ArrayList<>();
+
+        JPanel productsPanel6 = new JPanel(new GridLayout(0 /*rows*/, 2 /*columns*/, 5 /*Horizontal space */, 5 /*Vertical space */)); // GridLayout for products
+        productsPanel6.setBackground(Color.black);
+        productsPanel6.setBounds(25, 115, 770, 500);
+
+        displayProducts6(productsPanel6, currentPage);
+        Panel9.add(productsPanel6);
+        // getContentPane().add(Panel6, BorderLayout.CENTER);
+        setLocationRelativeTo(null);
+
+        JButton backButton6 = new JButton("Back");
+        backButton6.setBounds(290, 653, 100, 30);
+        backButton6.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        backButton6.setForeground(Color.BLACK);
+        backButton6.setBackground(customColor1);
+        backButton6.setEnabled(true);
+        backButton6.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+
+        backButton6.addActionListener(new BackButton6ActionListener());
+        Panel9.add(backButton6);
+
+        JButton nextButton6 = new JButton("Next");
+        nextButton6.setBounds(415, 653, 100, 30);
+        nextButton6.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        nextButton6.setForeground(Color.BLACK);
+        nextButton6.setBackground(customColor1);
+        nextButton6.setEnabled(true);
+        nextButton6.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+        nextButton6.addActionListener(new NextButton6ActionListener());
+        Panel9.add(nextButton6);
+
+        currentPage = 0;
+
+        //add(Panel9);
+        setVisible(true);
+
+        // ************ PANEL 10 ********************   
+        // Define the list of product IDs you want to fetch
+        java.util.List<String> specificProductIDs7 = new ArrayList<>();
+        specificProductIDs7.add("1013");
+        specificProductIDs7.add("1014");
+        specificProductIDs7.add("1016");
+        specificProductIDs7.add("1017");
+        specificProductIDs7.add("1018");
+        specificProductIDs7.add("1019");
+        // specificProductIDs4.add("1009");
+        // specificProductIDs4.add("1009");
+
+        // Add more product IDs as needed
+        // Fetch products based on specific IDs
+        products7 = fetchProductsFromDatabase7(specificProductIDs7);
+        // Rest of your code remains the same...
+        cart7 = new ArrayList<>();
+
+        JPanel productsPanel7 = new JPanel(new GridLayout(0 /*rows*/, 2 /*columns*/, 5 /*Horizontal space */, 5 /*Vertical space */)); // GridLayout for products
+        productsPanel7.setBackground(Color.black);
+        productsPanel7.setBounds(25, 115, 770, 500);
+
+        displayProducts7(productsPanel7, currentPage);
+        Panel10.add(productsPanel7);
+        // getContentPane().add(Panel7, BorderLayout.CENTER);
+        setLocationRelativeTo(null);
+
+        JButton backButton7 = new JButton("Back");
+        backButton7.setBounds(290, 653, 100, 30);
+        backButton7.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        backButton7.setForeground(Color.BLACK);
+        backButton7.setBackground(customColor1);
+        backButton7.setEnabled(true);
+        backButton7.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+
+        backButton7.addActionListener(new BackButton7ActionListener());
+        Panel10.add(backButton7);
+
+        JButton nextButton7 = new JButton("Next");
+        nextButton7.setBounds(415, 653, 100, 30);
+        nextButton7.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        nextButton7.setForeground(Color.BLACK);
+        nextButton7.setBackground(customColor1);
+        nextButton7.setEnabled(true);
+        nextButton7.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+        nextButton7.addActionListener(new NextButton7ActionListener());
+        Panel10.add(nextButton7);
+
+        currentPage = 0;
+
+        //add(Panel9);
+        setVisible(true);
+
+        // ************ PANEL 11 ********************   
+        // Define the list of product IDs you want to fetch
+        java.util.List<String> specificProductIDs8 = new ArrayList<>();
+        specificProductIDs8.add("1020");
+        specificProductIDs8.add("1021");
+        specificProductIDs8.add("1022");
+        specificProductIDs8.add("1023");
+        specificProductIDs8.add("1024");
+        specificProductIDs8.add("1025");
+        // specificProductIDs8.add("1009");
+        // specificProductIDs8.add("1009");
+
+        // Add more product IDs as needed
+        // Fetch products based on specific IDs
+        products8 = fetchProductsFromDatabase8(specificProductIDs8);
+        // Rest of your code remains the same...
+        cart8 = new ArrayList<>();
+
+        JPanel productsPanel8 = new JPanel(new GridLayout(0 /*rows*/, 2 /*columns*/, 5 /*Horizontal space */, 5 /*Vertical space */)); // GridLayout for products
+        productsPanel8.setBackground(Color.black);
+        productsPanel8.setBounds(25, 115, 770, 500);
+
+        displayProducts8(productsPanel8, currentPage);
+        Panel11.add(productsPanel8);
+        // getContentPane().add(Panel7, BorderLayout.CENTER);
+        setLocationRelativeTo(null);
+
+        JButton backButton8 = new JButton("Back");
+        backButton8.setBounds(290, 653, 100, 30);
+        backButton8.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        backButton8.setForeground(Color.BLACK);
+        backButton8.setBackground(customColor1);
+        backButton8.setEnabled(true);
+        backButton8.setBorder(BorderFactory.createLineBorder(Color.RED, 4)); // Add border
+
+        backButton8.addActionListener(new BackButton8ActionListener());
+        Panel11.add(backButton8);
+
+        JButton nextButton8 = new JButton("Next");
+        nextButton8.setBounds(415, 653, 100, 30);
+        nextButton8.setFont(new Font("Times new Roman", Font.BOLD, 16));
+        nextButton8.setForeground(Color.BLACK);
+        nextButton8.setBackground(customColor1);
+        nextButton8.setEnabled(true);
+        nextButton8.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+        nextButton8.addActionListener(new NextButton8ActionListener());
+        Panel11.add(nextButton8);
+
+        currentPage = 0;
+
+        //add(Panel9);
+        setVisible(true);
+
+    }
+
+    // *********** START OF LOGIN PAGE METHODS **************
+    // Method to set placeholder in password field
+    private void setPlaceholder(JPasswordField passwordField, String text) {
+        passwordField.setEchoChar((char) 0); // Set echo char to 0 for displaying plain text
+
+        passwordField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (String.valueOf(passwordField.getPassword()).equals(text)) {
+                    passwordField.setText(""); // Clear the placeholder text when field is focused
+                    passwordField.setEchoChar('*'); // Set the echo char to password character
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (String.valueOf(passwordField.getPassword()).equals("")) {
+                    passwordField.setText(text); // Set the placeholder text if no text was entered
+                    passwordField.setEchoChar((char) 0); // Set echo char to 0 for displaying plain text
+                }
+            }
+        });
+
+        passwordField.setText(text); // Set initial text as the placeholder
+        passwordField.setForeground(Color.DARK_GRAY); // Set the color of the placeholder text
+    }
+
+    // ********** END OF LOGIN PAGE METHODS ************
+    // ********** START OF SIGNUP PAGE METHODS ***********
+    // Method to set placeholder in password field
+    private void setPlaceholder_s1(JPasswordField passwordField_s1, String text) {
+        passwordField_s1.setEchoChar((char) 0); // Set echo char to 0 for displaying plain text
+
+        passwordField_s1.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (String.valueOf(passwordField_s1.getPassword()).equals(text)) {
+                    passwordField_s1.setText(""); // Clear the placeholder text when field is focused
+                    passwordField_s1.setEchoChar('*'); // Set the echo char to password character
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (String.valueOf(passwordField_s1.getPassword()).equals("")) {
+                    passwordField_s1.setText(text); // Set the placeholder text if no text was entered
+                    passwordField_s1.setEchoChar((char) 0); // Set echo char to 0 for displaying plain text
+                }
+            }
+        });
+
+        passwordField_s1.setText(text); // Set initial text as the placeholder
+        passwordField_s1.setForeground(Color.DARK_GRAY); // Set the color of the placeholder text
+    }
+    // Method to set placeholder in password field
+
+    private void setPlaceholder_s2(JPasswordField rePasswordField_s1, String text) {
+        rePasswordField_s1.setEchoChar((char) 0); // Set echo char to 0 for displaying plain text
+
+        rePasswordField_s1.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (String.valueOf(rePasswordField_s1.getPassword()).equals(text)) {
+                    rePasswordField_s1.setText(""); // Clear the placeholder text when field is focused
+                    rePasswordField_s1.setEchoChar('*'); // Set the echo char to password character
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (String.valueOf(rePasswordField_s1.getPassword()).equals("")) {
+                    rePasswordField_s1.setText(text); // Set the placeholder text if no text was entered
+                    rePasswordField_s1.setEchoChar((char) 0); // Set echo char to 0 for displaying plain text
+                }
+            }
+        });
+
+        rePasswordField_s1.setText(text); // Set initial text as the placeholder
+        rePasswordField_s1.setForeground(Color.DARK_GRAY); // Set the color of the placeholder text
+
+    }
+    // ************ END OF SIGNUP PAGE METHODS *******************
+
+    // *************** PANEL4 LANDING PAGE METHODS STARTS ****************
+    private void displayPayment(JPanel productsPanel, int page) {
+        productsPanel.removeAll(); // Clear existing components
+        productsPanel.setLayout(new GridLayout(0, 2, 10, 10)); // Set GridLayout
+
+        for (Product product : products1) {
+            JPanel productPanel = new JPanel(new BorderLayout());
+
+            /*try {
+        URL imageURL = new URL(product.getImageURL());
+        BufferedImage img = ImageIO.read(imageURL);
+        JLabel imageLabel = new JLabel(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+        productPanel.add(imageLabel, BorderLayout.CENTER);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }*/
+            JTextArea detailsArea = new JTextArea(
+                    "      \n       " + product.getName() + " \n\n\n       Rs. " + product.getPrice() + "\n\n\n      " + product.getDescription()
+            );
+            detailsArea.setFont(new Font("Times new roman", Font.BOLD, 15));
+            detailsArea.setForeground(Color.BLACK);
+            detailsArea.setEditable(false);
+            detailsArea.setBackground(customColor1);
+            productPanel.add(detailsArea, BorderLayout.CENTER); // Change to CENTER
+
+            // Buttons panel
+            JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+            JButton viewProductButton = new JButton("View product");
+            viewProductButton.addActionListener(new ViewDetailsActionListener(product));
+            buttonsPanel.add(viewProductButton);
+
+            JButton proceedWithPaymentButton = new JButton("Proceed with payment");
+            proceedWithPaymentButton.addActionListener(new PaymentActionListener());
+            buttonsPanel.add(proceedWithPaymentButton);
+
+            // Add buttons panel to product panel
+            productPanel.add(buttonsPanel, BorderLayout.SOUTH);
+
+            productPanel.setBorder(BorderFactory.createLineBorder(customColor2, 4));
+            productsPanel.add(productPanel);
+        }
+
+        // Ensure components are immediately displayed
+        productsPanel.revalidate();
+        productsPanel.repaint();
+    }
+
+    private class ViewDetailsActionListener implements ActionListener {
+
+        private Product product;
+
+        public ViewDetailsActionListener(Product product) {
+            this.product = product;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new ProductDetailsGUI(product);
+        }
+    }
+
+    private class PaymentActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new PaymentPanel();
+        }
+    }
+
+    // Method to fetch product IDs from the database based on the search text
+    private List<String> fetchProductIDsFromDatabase(String searchText) {
+        List<String> searchedProductIDs = new ArrayList<>();
+
+        try (Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "system", "1234")) {
+            // Creating a SQL query string to fetch product IDs based on name
+            String query = "SELECT id FROM Products_list WHERE LOWER(name) LIKE '%" + searchText + "%'";
+
+            try (Statement statement = con.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
+                while (resultSet.next()) {
+                    searchedProductIDs.add(resultSet.getString("id"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle any exceptions or error messages here
+        }
+
+        return searchedProductIDs;
+    }
+
+    // Method to add a slideshow gallery
+    private void startSlideshow() {
+        try {
+            URL slideImageURL1 = new URL("https://media.licdn.com/dms/image/D5622AQHXgTGMNzrLvg/feedshare-shrink_2048_1536/0/1701434309554?e=1704326400&v=beta&t=bAPn49mlFahyem2ixakR53mC2ZPLRlj0E6BoI3EfW-0");
+            BufferedImage img1 = ImageIO.read(slideImageURL1);
+            slideImageLabel1 = new JLabel(new ImageIcon(img1));
+            slideImageLabel1.setBounds(0, 0, 740, 200);
+
+            URL slideImageURL2 = new URL("https://media.licdn.com/dms/image/D5622AQHZXx2M7C1eGA/feedshare-shrink_2048_1536/0/1701434356871?e=1704326400&v=beta&t=k45mWB2L2M-X46RTNXpkeuxGp2exDO0XnFuHQ5lFzOc");
+            BufferedImage img2 = ImageIO.read(slideImageURL2);
+            slideImageLabel2 = new JLabel(new ImageIcon(img2));
+            slideImageLabel2.setBounds(0, 0, 740, 200);
+
+            URL slideImageURL3 = new URL("https://media.licdn.com/dms/image/D5622AQGydweHZ9xa8w/feedshare-shrink_2048_1536/0/1701434391473?e=1704326400&v=beta&t=m9DyL1Y90m-HcJzXcWlbxRRDscYUCvESX8TdR0xZvuo");
+            BufferedImage img3 = ImageIO.read(slideImageURL3);
+            slideImageLabel3 = new JLabel(new ImageIcon(img3));
+            slideImageLabel3.setBounds(0, 0, 740, 200);
+
+            URL slideImageURL4 = new URL("https://media.licdn.com/dms/image/D5622AQEcU84O0_erGw/feedshare-shrink_2048_1536/0/1701434419847?e=1704326400&v=beta&t=JPNqncW0YYjtRGrmRgS4wLvJTu4VxJilv5Jx5ZnWWE0");
+            BufferedImage img4 = ImageIO.read(slideImageURL4);
+            slideImageLabel4 = new JLabel(new ImageIcon(img4));
+            slideImageLabel4.setBounds(0, 0, 740, 200);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading images from URL: " + e.getMessage());
+        }
+
+        slideImageLabel1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Add action for the first image (slideImageLabel1)
+                System.out.println("\nClicked on Electronics Banner!!");
+                // Perform desired action here...
+            }
+        });
+        slideImageLabel2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Add action for the first image (slideImageLabel1)
+                System.out.println("\nClicked on Beauty Products Banner!!");
+                // Perform desired action here...
+            }
+        });
+        slideImageLabel3.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Add action for the first image (slideImageLabel1)
+                System.out.println("\nClicked on Mobiles banner!!");
+                // Perform desired action here...
+            }
+        });
+
+        slideImageLabel4.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Add action for the first image (slideImageLabel1)
+                System.out.println("\nClicked on Mens Fashion Banner!!");
+                // Perform desired action here...
+            }
+        });
+
+        JPanel slideshowPanel = new JPanel();
+        slideshowPanel.setLayout(null); // Set layout to null for manual positioning
+        slideshowPanel.setBounds(35, 235, 740, 200);
+        slideshowPanel.setBackground(Color.BLACK);
+
+        slideshowPanel.add(slideImageLabel1);
+        slideshowPanel.add(slideImageLabel2);
+        slideshowPanel.add(slideImageLabel3);
+        slideshowPanel.add(slideImageLabel4);
+
+        Panel4.add(slideshowPanel);
+
+        slideshowTimer = new Timer(1500, new ActionListener() {
+            int counter = 0;
+
+            public void actionPerformed(ActionEvent e) {
+                if (counter % 4 == 0) {
+                    slideImageLabel1.setVisible(true);
+                    slideImageLabel2.setVisible(false);
+                    slideImageLabel3.setVisible(false);
+                    slideImageLabel4.setVisible(false);
+                } else if (counter % 4 == 1) {
+                    slideImageLabel1.setVisible(false);
+                    slideImageLabel2.setVisible(true);
+                    slideImageLabel3.setVisible(false);
+                    slideImageLabel4.setVisible(false);
+                } else if (counter % 4 == 2) {
+                    slideImageLabel1.setVisible(false);
+                    slideImageLabel2.setVisible(false);
+                    slideImageLabel3.setVisible(true);
+                    slideImageLabel4.setVisible(false);
+                } else {
+                    slideImageLabel1.setVisible(false);
+                    slideImageLabel2.setVisible(false);
+                    slideImageLabel3.setVisible(false);
+                    slideImageLabel4.setVisible(true);
+                }
+
+                counter++;
+            }
+        });
+        slideshowTimer.start(); // Start the slideshow timer
+    }
+
+    private void changeSlide(boolean forward) {
+        switch (currentSlide) {
+            case 0:
+                slideImageLabel1.setVisible(false);
+                break;
+            case 1:
+                slideImageLabel2.setVisible(false);
+                break;
+            case 2:
+                slideImageLabel3.setVisible(false);
+                break;
+            case 3:
+                slideImageLabel4.setVisible(false);
+                break;
+        }
+
+        if (forward) {
+            currentSlide = (currentSlide + 1) % 4; // Update the current slide index
+        } else {
+            currentSlide = (currentSlide - 1 + 4) % 4; // Update the current slide index
+        }
+
+        switch (currentSlide) {
+            case 0:
+                slideImageLabel1.setVisible(true);
+                break;
+            case 1:
+                slideImageLabel2.setVisible(true);
+                break;
+            case 2:
+                slideImageLabel3.setVisible(true);
+                break;
+            case 3:
+                slideImageLabel4.setVisible(true);
+                break;
+        }
+    }
+
+// *************** FETCHING PRODUCTS IN PANEL 4 ******************    
+    private java.util.List<Product> fetchProductsFromDatabase(java.util.List<String> productIDs1) {
+        java.util.List<Product> productList1 = new ArrayList<>();
+
+        try (Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "system", "1234")) {
+            // Creating a SQL query string with a WHERE clause to fetch products by IDs1
+            String query = "SELECT * FROM Products_list WHERE id IN (";
+            for (int i = 0; i < productIDs1.size(); i++) {
+                query += "'" + productIDs1.get(i) + "'";
+                if (i < productIDs1.size() - 1) {
+                    query += ",";
+                }
+            }
+            query += ")";
+
+            try (Statement statement = con.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
+
+                while (resultSet.next()) {
+                    String id = resultSet.getString("id");
+                    String name = resultSet.getString("name");
+                    String category = resultSet.getString("category");
+                    String description = resultSet.getString("description");
+                    double price = resultSet.getDouble("price");
+                    String imageURL = resultSet.getString("imageURL");
+                    String imageURL2 = resultSet.getString("imageURL2");
+                    String imageURL3 = resultSet.getString("imageURL3");
+
+                    Product product = new Product(id, name, category, description, price, imageURL, imageURL2, imageURL3);
+                    productList1.add(product);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle any exceptions or error messages here
+        }
+
+        return productList1;
+    }
+
+    // ************** DISPLAYING PRODTS IN PANEL 4 ***********************
+    private void displayProducts(JPanel productsPanel, int page) {
+
+        for (Product product : products1) {
+            JPanel productPanel = new JPanel(new BorderLayout());
+            productPanel.setLayout(null); // Setting null layout
+            try {
+                URL imageURL = new URL(product.getImageURL());
+                BufferedImage img = ImageIO.read(imageURL);
+                JLabel imageLabel = new JLabel(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+                imageLabel.setBounds(10, 10, 100, 100); // x, y, width, height
+
+                productPanel.add(imageLabel);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            String fullName = product.getName();
+            int halfLength = fullName.length() / 2;
+
+            String firstName = fullName.substring(0, halfLength);
+            String lastName = fullName.substring(halfLength);
+
+            JTextArea detailsArea = new JTextArea(
+                    "      \n       " + firstName + "   \n      " + lastName + " \n\n       Rs. " + product.getPrice() + "/-" + "\n\n\n      " + product.getDescription()
+            );
+            detailsArea.setFont(new Font("Times new roman", Font.BOLD, 15));
+            detailsArea.setForeground(Color.BLACK);
+            detailsArea.setEditable(false);
+            detailsArea.setBounds(120, 10, 250, 130);
+            detailsArea.setBackground(customColor1);
+            productPanel.add(detailsArea);
+
+            JButton viewProductButton = new JButton("View product");
+            viewProductButton.setBounds(10, 112, 109, 30); // x, y, width, height
+            viewProductButton.setFont(new Font("Times new Roman", Font.BOLD, 16));
+            viewProductButton.setForeground(Color.BLACK);
+            viewProductButton.setBackground(customColor1);
+            viewProductButton.setEnabled(true);
+            viewProductButton.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+            viewProductButton.addActionListener(new ViewProductActionListener(product));
+            productPanel.add(viewProductButton);
+
+            productPanel.setBorder(BorderFactory.createLineBorder(customColor2, 4));
+            productsPanel.add(productPanel);
+        }
+    }
+
+    private class ViewProductActionListener implements ActionListener {
+
+        private Product product;
+
+        public ViewProductActionListener(Product product) {
+            this.product = product;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new ProductDetailsGUI(product);
+        }
+    }
+
+    private class NextButtonActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // currentPage++;
+            remove(Panel4);
+            add(Panel5);
+            setTitle("TROVE CART - TODAY DEALS PAGE 2");
+            revalidate();
+            repaint();
+        }
+    }
+
+    private class BackButtonActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (currentPage > 0) {
+                currentPage--;
+                // refreshProductDisplay();
+            }
+        }
+    }
+
+// ************* FETCHING PRODUCTS FOR PANEL 5 ************************
+    private java.util.List<Product> fetchProductsFromDatabase2(java.util.List<String> productIDs2) {
+        java.util.List<Product> productList2 = new ArrayList<>();
+
+        // Modify your SQL query as needed to fetch specific products
+        // Here's an example:
+        try (Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "system", "1234")) {
+            String query = "SELECT * FROM Products_list WHERE id IN (";
+            for (int i = 0; i < productIDs2.size(); i++) {
+                query += "'" + productIDs2.get(i) + "'";
+                if (i < productIDs2.size() - 1) {
+                    query += ",";
+                }
+            }
+            query += ")";
+
+            try (Statement statement = con.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
+
+                while (resultSet.next()) {
+                    String id = resultSet.getString("id");
+                    String name = resultSet.getString("name");
+                    String category = resultSet.getString("category");
+                    String description = resultSet.getString("description");
+                    double price = resultSet.getDouble("price");
+                    String imageURL = resultSet.getString("imageURL");
+                    String imageURL2 = resultSet.getString("imageURL2");
+                    String imageURL3 = resultSet.getString("imageURL3");
+
+                    Product product = new Product(id, name, category, description, price, imageURL, imageURL2, imageURL3);
+                    productList2.add(product);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle any exceptions or error messages here
+        }
+
+        return productList2;
+    }
+
+// **************** DISPLAYING PRODUCTS FOR PANEL 5 **************************
+    private void displayProducts2(JPanel productsPanel2, int page) {
+        for (Product product : products2) {
+            JPanel productPanel2 = new JPanel(new BorderLayout());
+            productPanel2.setLayout(null); // Setting null layout
+            try {
+                URL imageURL = new URL(product.getImageURL());
+                BufferedImage img = ImageIO.read(imageURL);
+                JLabel imageLabel = new JLabel(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+                imageLabel.setBounds(10, 10, 100, 100); // x, y, width, height
+
+                productPanel2.add(imageLabel);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            String fullName = product.getName();
+            int halfLength = fullName.length() / 2;
+
+            String firstName = fullName.substring(0, halfLength);
+            String lastName = fullName.substring(halfLength);
+
+            JTextArea detailsArea = new JTextArea(
+                    "      \n       " + firstName + "   \n      " + lastName + " \n\n       Rs. " + product.getPrice() + "/-" + "\n\n\n      " + product.getDescription()
+            );
+            detailsArea.setFont(new Font("Times new roman", Font.BOLD, 15));
+            detailsArea.setForeground(Color.BLACK);
+            detailsArea.setEditable(false);
+            detailsArea.setBounds(120, 10, 250, 130);
+            detailsArea.setBackground(customColor1);
+            productPanel2.add(detailsArea);
+
+            JButton viewProductButton2 = new JButton("View product");
+            viewProductButton2.setBounds(10, 112, 109, 30); // x, y, width, height
+            viewProductButton2.setFont(new Font("Times new Roman", Font.BOLD, 16));
+            viewProductButton2.setForeground(Color.BLACK);
+            viewProductButton2.setBackground(customColor1);
+            viewProductButton2.setEnabled(true);
+            viewProductButton2.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+            viewProductButton2.addActionListener(new ViewProduct2ActionListener(product));
+            productPanel2.add(viewProductButton2);
+
+            productPanel2.setBorder(BorderFactory.createLineBorder(customColor2, 4));
+            productsPanel2.add(productPanel2);
+        }
+    }
+
+    private class ViewProduct2ActionListener implements ActionListener {
+
+        private Product product;
+
+        public ViewProduct2ActionListener(Product product) {
+            this.product = product;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new ProductDetailsGUI(product);
+        }
+    }
+
+    private class NextButton2ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // currentPage++;
+            remove(Panel5);
+            add(Panel6, BorderLayout.CENTER);
+            setTitle("TROVE CART - TODAY DEALS PAGE 3");
+            revalidate();
+            repaint();
+        }
+    }
+
+    private class BackButton2ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //if (currentPage > 0) {
+            // currentPage--;
+            remove(Panel5);
+            add(Panel4);
+            setTitle("TROVE CART - LANDING PAGE");
+            revalidate();
+            repaint();
+        }
+    }
+
+// ************* FETCHING PRODUCTS FOR PANEL 6 ************************
+    private java.util.List<Product> fetchProductsFromDatabase3(java.util.List<String> productIDs3) {
+        java.util.List<Product> productList3 = new ArrayList<>();
+
+        // Modify your SQL query as needed to fetch specific products
+        // Here's an example:
+        try (Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "system", "1234")) {
+            String query = "SELECT * FROM Products_list WHERE id IN (";
+            for (int i = 0; i < productIDs3.size(); i++) {
+                query += "'" + productIDs3.get(i) + "'";
+                if (i < productIDs3.size() - 1) {
+                    query += ",";
+                }
+            }
+            query += ")";
+
+            try (Statement statement = con.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
+
+                while (resultSet.next()) {
+                    String id = resultSet.getString("id");
+                    String name = resultSet.getString("name");
+                    String category = resultSet.getString("category");
+                    String description = resultSet.getString("description");
+                    double price = resultSet.getDouble("price");
+                    String imageURL = resultSet.getString("imageURL");
+                    String imageURL2 = resultSet.getString("imageURL2");
+                    String imageURL3 = resultSet.getString("imageURL3");
+
+                    Product product = new Product(id, name, category, description, price, imageURL, imageURL2, imageURL3);
+                    productList3.add(product);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle any exceptions or error messages here
+        }
+
+        return productList3;
+    }
+
+// **************** DISPLAYING PRODUCTS FOR PANEL 6 **************************
+    private void displayProducts3(JPanel productsPanel3, int page) {
+        for (Product product : products3) {
+            JPanel productPanel3 = new JPanel(new BorderLayout());
+            productPanel3.setLayout(null); // Setting null layout
+            try {
+                URL imageURL = new URL(product.getImageURL());
+                BufferedImage img = ImageIO.read(imageURL);
+                JLabel imageLabel = new JLabel(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+                imageLabel.setBounds(10, 10, 100, 100); // x, y, width, height
+
+                productPanel3.add(imageLabel);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            String fullName = product.getName();
+            int halfLength = fullName.length() / 2;
+
+            String firstName = fullName.substring(0, halfLength);
+            String lastName = fullName.substring(halfLength);
+
+            JTextArea detailsArea = new JTextArea(
+                    "      \n       " + firstName + "   \n      " + lastName + " \n\n       Rs. " + product.getPrice() + "/-" + "\n\n\n      " + product.getDescription()
+            );
+            detailsArea.setFont(new Font("Times new roman", Font.BOLD, 15));
+            detailsArea.setForeground(Color.BLACK);
+            detailsArea.setEditable(false);
+            detailsArea.setBounds(120, 10, 250, 130);
+            detailsArea.setBackground(customColor1);
+            productPanel3.add(detailsArea);
+
+            JButton viewProductButton3 = new JButton("View product");
+            viewProductButton3.setBounds(10, 112, 109, 30); // x, y, width, height
+            viewProductButton3.setFont(new Font("Times new Roman", Font.BOLD, 16));
+            viewProductButton3.setForeground(Color.BLACK);
+            viewProductButton3.setBackground(customColor1);
+            viewProductButton3.setEnabled(true);
+            viewProductButton3.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+            viewProductButton3.addActionListener(new ViewProduct3ActionListener(product));
+            productPanel3.add(viewProductButton3);
+
+            productPanel3.setBorder(BorderFactory.createLineBorder(customColor2, 4));
+            productsPanel3.add(productPanel3);
+        }
+    }
+
+    private class ViewProduct3ActionListener implements ActionListener {
+
+        private Product product;
+
+        public ViewProduct3ActionListener(Product product) {
+            this.product = product;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new ProductDetailsGUI(product);
+        }
+    }
+
+    private class NextButton3ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //currentPage++;
+            remove(Panel6);
+            add(Panel7, BorderLayout.CENTER);
+            setTitle("TROVE CART - TODAY DEALS PAGE 4");
+            revalidate();
+            repaint();
+        }
+    }
+
+    private class BackButton3ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //if (currentPage > 0) {
+            // currentPage--;
+            remove(Panel6);
+            add(Panel5);
+            setTitle("TROVE CART - TODAY DEALS PAGE 2");
+            revalidate();
+            repaint();
+        }
+    }
+
+    // ************* FETCHING PRODUCTS FOR PANEL 7 ************************
+    private java.util.List<Product> fetchProductsFromDatabase4(java.util.List<String> productIDs4) {
+        java.util.List<Product> productList4 = new ArrayList<>();
+
+        // Modify your SQL query as needed to fetch specific products
+        // Here's an example:
+        try (Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "system", "1234")) {
+            String query = "SELECT * FROM Products_list WHERE id IN (";
+            for (int i = 0; i < productIDs4.size(); i++) {
+                query += "'" + productIDs4.get(i) + "'";
+                if (i < productIDs4.size() - 1) {
+                    query += ",";
+                }
+            }
+            query += ")";
+
+            try (Statement statement = con.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
+
+                while (resultSet.next()) {
+                    String id = resultSet.getString("id");
+                    String name = resultSet.getString("name");
+                    String category = resultSet.getString("category");
+                    String description = resultSet.getString("description");
+                    double price = resultSet.getDouble("price");
+                    String imageURL = resultSet.getString("imageURL");
+                    String imageURL2 = resultSet.getString("imageURL2");
+                    String imageURL3 = resultSet.getString("imageURL3");
+
+                    Product product = new Product(id, name, category, description, price, imageURL, imageURL2, imageURL3);
+                    productList4.add(product);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle any exceptions or error messages here
+        }
+
+        return productList4;
+    }
+
+// **************** DISPLAYING PRODUCTS FOR PANEL 7 **************************
+    private void displayProducts4(JPanel productsPanel4, int page) {
+        for (Product product : products4) {
+            JPanel productPanel4 = new JPanel(new BorderLayout());
+            productPanel4.setLayout(null); // Setting null layout
+            try {
+                URL imageURL = new URL(product.getImageURL());
+                BufferedImage img = ImageIO.read(imageURL);
+                JLabel imageLabel = new JLabel(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+                imageLabel.setBounds(10, 10, 100, 100); // x, y, width, height
+
+                productPanel4.add(imageLabel);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            String fullName = product.getName();
+            int halfLength = fullName.length() / 2;
+
+            String firstName = fullName.substring(0, halfLength);
+            String lastName = fullName.substring(halfLength);
+
+            JTextArea detailsArea = new JTextArea(
+                    "      \n       " + firstName + "   \n      " + lastName + " \n\n       Rs. " + product.getPrice() + "/-" + "\n\n\n      " + product.getDescription()
+            );
+            detailsArea.setFont(new Font("Times new roman", Font.BOLD, 15));
+            detailsArea.setForeground(Color.BLACK);
+            detailsArea.setEditable(false);
+            detailsArea.setBounds(120, 10, 250, 130);
+            detailsArea.setBackground(customColor1);
+            productPanel4.add(detailsArea);
+
+            JButton viewProductButton4 = new JButton("View product");
+            viewProductButton4.setBounds(10, 112, 109, 30); // x, y, width, height
+            viewProductButton4.setFont(new Font("Times new Roman", Font.BOLD, 16));
+            viewProductButton4.setForeground(Color.BLACK);
+            viewProductButton4.setBackground(customColor1);
+            viewProductButton4.setEnabled(true);
+            viewProductButton4.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+            viewProductButton4.addActionListener(new ViewProduct4ActionListener(product));
+            productPanel4.add(viewProductButton4);
+
+            productPanel4.setBorder(BorderFactory.createLineBorder(customColor2, 4));
+            productsPanel4.add(productPanel4);
+        }
+    }
+
+    private class ViewProduct4ActionListener implements ActionListener {
+
+        private Product product;
+
+        public ViewProduct4ActionListener(Product product) {
+            this.product = product;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new ProductDetailsGUI(product);
+        }
+    }
+
+    private class NextButton4ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //currentPage++;
+            // remove(Panel6);
+            // add(Panel7, BorderLayout.CENTER);
+            // setTitle("TROVE CART - TODAY DEALS PAGE 4");
+            // revalidate();
+            // repaint();
+        }
+    }
+
+    private class BackButton4ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //if (currentPage > 0) {
+            // currentPage--;
+            remove(Panel7);
+            add(Panel6);
+            setTitle("TROVE CART - TODAY DEALS PAGE 3");
+            revalidate();
+            repaint();
+        }
+    }
+
+    // ************* FETCHING PRODUCTS FOR PANEL 8 ************************
+    private java.util.List<Product> fetchProductsFromDatabase5(java.util.List<String> productIDs5) {
+        java.util.List<Product> productList5 = new ArrayList<>();
+
+        // Modify your SQL query as needed to fetch specific products
+        // Here's an example:
+        try (Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "system", "1234")) {
+            String query = "SELECT * FROM Products_list WHERE id IN (";
+            for (int i = 0; i < productIDs5.size(); i++) {
+                query += "'" + productIDs5.get(i) + "'";
+                if (i < productIDs5.size() - 1) {
+                    query += ",";
+                }
+            }
+            query += ")";
+
+            try (Statement statement = con.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
+
+                while (resultSet.next()) {
+                    String id = resultSet.getString("id");
+                    String name = resultSet.getString("name");
+                    String category = resultSet.getString("category");
+                    String description = resultSet.getString("description");
+                    double price = resultSet.getDouble("price");
+                    String imageURL = resultSet.getString("imageURL");
+                    String imageURL2 = resultSet.getString("imageURL2");
+                    String imageURL3 = resultSet.getString("imageURL3");
+
+                    Product product = new Product(id, name, category, description, price, imageURL, imageURL2, imageURL3);
+                    productList5.add(product);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle any exceptions or error messages here
+        }
+
+        return productList5;
+    }
+
+// **************** DISPLAYING PRODUCTS FOR PANEL 8 **************************
+    private void displayProducts5(JPanel productsPanel5, int page) {
+        for (Product product : products5) {
+            JPanel productPanel5 = new JPanel(new BorderLayout());
+            productPanel5.setLayout(null); // Setting null layout
+            try {
+                URL imageURL = new URL(product.getImageURL());
+                BufferedImage img = ImageIO.read(imageURL);
+                JLabel imageLabel = new JLabel(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+                imageLabel.setBounds(10, 10, 100, 100); // x, y, width, height
+
+                productPanel5.add(imageLabel);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            String fullName = product.getName();
+            int halfLength = fullName.length() / 2;
+
+            String firstName = fullName.substring(0, halfLength);
+            String lastName = fullName.substring(halfLength);
+
+            JTextArea detailsArea = new JTextArea(
+                    "      \n       " + firstName + "   \n      " + lastName + " \n\n       Rs. " + product.getPrice() + "/-" + "\n\n\n      " + product.getDescription()
+            );
+            detailsArea.setFont(new Font("Times new roman", Font.BOLD, 15));
+            detailsArea.setForeground(Color.BLACK);
+            detailsArea.setEditable(false);
+            detailsArea.setBounds(120, 10, 250, 130);
+            detailsArea.setBackground(customColor1);
+            productPanel5.add(detailsArea);
+
+            JButton viewProductButton5 = new JButton("View product");
+            viewProductButton5.setBounds(10, 112, 109, 30); // x, y, width, height
+            viewProductButton5.setFont(new Font("Times new Roman", Font.BOLD, 16));
+            viewProductButton5.setForeground(Color.BLACK);
+            viewProductButton5.setBackground(customColor1);
+            viewProductButton5.setEnabled(true);
+            viewProductButton5.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+            viewProductButton5.addActionListener(new ViewProduct5ActionListener(product));
+            productPanel5.add(viewProductButton5);
+
+            productPanel5.setBorder(BorderFactory.createLineBorder(customColor2, 5));
+            productsPanel5.add(productPanel5);
+        }
+    }
+
+    private class ViewProduct5ActionListener implements ActionListener {
+
+        private Product product;
+
+        public ViewProduct5ActionListener(Product product) {
+            this.product = product;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new ProductDetailsGUI(product);
+        }
+    }
+
+    private class NextButton5ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //currentPage++;
+            remove(Panel8);
+            add(Panel9, BorderLayout.CENTER);
+            setTitle("TROVE CART - CATEGORY DEALS PAGE 2");
+            revalidate();
+            repaint();
+        }
+    }
+
+    private class BackButton5ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //if (currentPage > 0) {
+            // currentPage--;
+            remove(Panel8);
+            add(Panel4);
+            setTitle("TROVE CART - LANDING PAGE");
+            revalidate();
+            repaint();
+        }
+    }
+
+    // ************* FETCHING PRODUCTS FOR PANEL 9 ************************
+    private java.util.List<Product> fetchProductsFromDatabase6(java.util.List<String> productIDs6) {
+        java.util.List<Product> productList6 = new ArrayList<>();
+
+        // Modify your SQL query as needed to fetch specific products
+        // Here's an example:
+        try (Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "system", "1234")) {
+            String query = "SELECT * FROM Products_list WHERE id IN (";
+            for (int i = 0; i < productIDs6.size(); i++) {
+                query += "'" + productIDs6.get(i) + "'";
+                if (i < productIDs6.size() - 1) {
+                    query += ",";
+                }
+            }
+            query += ")";
+
+            try (Statement statement = con.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
+
+                while (resultSet.next()) {
+                    String id = resultSet.getString("id");
+                    String name = resultSet.getString("name");
+                    String category = resultSet.getString("category");
+                    String description = resultSet.getString("description");
+                    double price = resultSet.getDouble("price");
+                    String imageURL = resultSet.getString("imageURL");
+                    String imageURL2 = resultSet.getString("imageURL2");
+                    String imageURL3 = resultSet.getString("imageURL3");
+
+                    Product product = new Product(id, name, category, description, price, imageURL, imageURL2, imageURL3);
+                    productList6.add(product);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle any exceptions or error messages here
+        }
+
+        return productList6;
+    }
+
+// **************** DISPLAYING PRODUCTS FOR PANEL 9 **************************
+    private void displayProducts6(JPanel productsPanel6, int page) {
+        for (Product product : products6) {
+            JPanel productPanel6 = new JPanel(new BorderLayout());
+            productPanel6.setLayout(null); // Setting null layout
+            try {
+                URL imageURL = new URL(product.getImageURL());
+                BufferedImage img = ImageIO.read(imageURL);
+                JLabel imageLabel = new JLabel(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+                imageLabel.setBounds(10, 10, 100, 100); // x, y, width, height
+
+                productPanel6.add(imageLabel);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            String fullName = product.getName();
+            int halfLength = fullName.length() / 2;
+
+            String firstName = fullName.substring(0, halfLength);
+            String lastName = fullName.substring(halfLength);
+
+            JTextArea detailsArea = new JTextArea(
+                    "      \n       " + firstName + "   \n      " + lastName + " \n\n       Rs. " + product.getPrice() + "/-" + "\n\n\n      " + product.getDescription()
+            );
+            detailsArea.setFont(new Font("Times new roman", Font.BOLD, 15));
+            detailsArea.setForeground(Color.BLACK);
+            detailsArea.setEditable(false);
+            detailsArea.setBounds(120, 10, 250, 130);
+            detailsArea.setBackground(customColor1);
+            productPanel6.add(detailsArea);
+
+            JButton viewProductButton6 = new JButton("View product");
+            viewProductButton6.setBounds(10, 112, 109, 30); // x, y, width, height
+            viewProductButton6.setFont(new Font("Times new Roman", Font.BOLD, 16));
+            viewProductButton6.setForeground(Color.BLACK);
+            viewProductButton6.setBackground(customColor1);
+            viewProductButton6.setEnabled(true);
+            viewProductButton6.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+            viewProductButton6.addActionListener(new ViewProduct6ActionListener(product));
+            productPanel6.add(viewProductButton6);
+
+            productPanel6.setBorder(BorderFactory.createLineBorder(customColor2, 6));
+            productsPanel6.add(productPanel6);
+        }
+    }
+
+    private class ViewProduct6ActionListener implements ActionListener {
+
+        private Product product;
+
+        public ViewProduct6ActionListener(Product product) {
+            this.product = product;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new ProductDetailsGUI(product);
+        }
+    }
+
+    private class NextButton6ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //currentPage++;
+
+        }
+    }
+
+    private class BackButton6ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //if (currentPage > 0) {
+            // currentPage--;
+            remove(Panel9);
+            add(Panel8);
+            setTitle("TROVE CART - GROCERY PAGE 1");
+            revalidate();
+            repaint();
+        }
+    }
+
+    // ************* FETCHING PRODUCTS FOR PANEL 10 ************************
+    private java.util.List<Product> fetchProductsFromDatabase7(java.util.List<String> productIDs7) {
+        java.util.List<Product> productList7 = new ArrayList<>();
+
+        // Modify your SQL query as needed to fetch specific products
+        // Here's an example:
+        try (Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "system", "1234")) {
+            String query = "SELECT * FROM Products_list WHERE id IN (";
+            for (int i = 0; i < productIDs7.size(); i++) {
+                query += "'" + productIDs7.get(i) + "'";
+                if (i < productIDs7.size() - 1) {
+                    query += ",";
+                }
+            }
+            query += ")";
+
+            try (Statement statement = con.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
+
+                while (resultSet.next()) {
+                    String id = resultSet.getString("id");
+                    String name = resultSet.getString("name");
+                    String category = resultSet.getString("category");
+                    String description = resultSet.getString("description");
+                    double price = resultSet.getDouble("price");
+                    String imageURL = resultSet.getString("imageURL");
+                    String imageURL2 = resultSet.getString("imageURL2");
+                    String imageURL3 = resultSet.getString("imageURL3");
+
+                    Product product = new Product(id, name, category, description, price, imageURL, imageURL2, imageURL3);
+                    productList7.add(product);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle any exceptions or error messages here
+        }
+
+        return productList7;
+    }
+
+// **************** DISPLAYING PRODUCTS FOR PANEL 10 **************************
+    private void displayProducts7(JPanel productsPanel7, int page) {
+        for (Product product : products7) {
+            JPanel productPanel7 = new JPanel(new BorderLayout());
+            productPanel7.setLayout(null); // Setting null layout
+            try {
+                URL imageURL = new URL(product.getImageURL());
+                BufferedImage img = ImageIO.read(imageURL);
+                JLabel imageLabel = new JLabel(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+                imageLabel.setBounds(10, 10, 100, 100); // x, y, width, height
+
+                productPanel7.add(imageLabel);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            String fullName = product.getName();
+            int halfLength = fullName.length() / 2;
+
+            String firstName = fullName.substring(0, halfLength);
+            String lastName = fullName.substring(halfLength);
+
+            JTextArea detailsArea = new JTextArea(
+                    "      \n       " + firstName + "   \n      " + lastName + " \n\n       Rs. " + product.getPrice() + "/-" + "\n\n\n      " + product.getDescription()
+            );
+            detailsArea.setFont(new Font("Times new roman", Font.BOLD, 15));
+            detailsArea.setForeground(Color.BLACK);
+            detailsArea.setEditable(false);
+            detailsArea.setBounds(120, 10, 250, 130);
+            detailsArea.setBackground(customColor1);
+            productPanel7.add(detailsArea);
+
+            JButton viewProductButton7 = new JButton("View product");
+            viewProductButton7.setBounds(10, 112, 109, 30); // x, y, width, height
+            viewProductButton7.setFont(new Font("Times new Roman", Font.BOLD, 16));
+            viewProductButton7.setForeground(Color.BLACK);
+            viewProductButton7.setBackground(customColor1);
+            viewProductButton7.setEnabled(true);
+            viewProductButton7.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+            viewProductButton7.addActionListener(new ViewProduct7ActionListener(product));
+            productPanel7.add(viewProductButton7);
+
+            productPanel7.setBorder(BorderFactory.createLineBorder(customColor2, 7));
+            productsPanel7.add(productPanel7);
+        }
+    }
+
+    private class ViewProduct7ActionListener implements ActionListener {
+
+        private Product product;
+
+        public ViewProduct7ActionListener(Product product) {
+            this.product = product;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new ProductDetailsGUI(product);
+        }
+    }
+
+    private class NextButton7ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //currentPage++;
+            remove(Panel10);
+            add(Panel11, BorderLayout.CENTER);
+            setTitle("TROVE CART - MOBILE DEAL PAGE 2");
+            revalidate();
+            repaint();
+
+        }
+    }
+
+    private class BackButton7ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //if (currentPage > 0) {
+            // currentPage--;
+            remove(Panel10);
+            add(Panel4);
+            setTitle("TROVE CART - MOBILE PAGE 1");
+            revalidate();
+            repaint();
+        }
+    }
+
+    // ************* FETCHING PRODUCTS FOR PANEL 11 ************************
+    private java.util.List<Product> fetchProductsFromDatabase8(java.util.List<String> productIDs8) {
+        java.util.List<Product> productList8 = new ArrayList<>();
+
+        // Modify your SQL query as needed to fetch specific products
+        // Here's an example:
+        try (Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "system", "1234")) {
+            String query = "SELECT * FROM Products_list WHERE id IN (";
+            for (int i = 0; i < productIDs8.size(); i++) {
+                query += "'" + productIDs8.get(i) + "'";
+                if (i < productIDs8.size() - 1) {
+                    query += ",";
+                }
+            }
+            query += ")";
+
+            try (Statement statement = con.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
+
+                while (resultSet.next()) {
+                    String id = resultSet.getString("id");
+                    String name = resultSet.getString("name");
+                    String category = resultSet.getString("category");
+                    String description = resultSet.getString("description");
+                    double price = resultSet.getDouble("price");
+                    String imageURL = resultSet.getString("imageURL");
+                    String imageURL2 = resultSet.getString("imageURL2");
+                    String imageURL3 = resultSet.getString("imageURL3");
+
+                    Product product = new Product(id, name, category, description, price, imageURL, imageURL2, imageURL3);
+                    productList8.add(product);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle any exceptions or error messages here
+        }
+
+        return productList8;
+    }
+
+// **************** DISPLAYING PRODUCTS FOR PANEL 11 **************************
+    private void displayProducts8(JPanel productsPanel8, int page) {
+        for (Product product : products8) {
+            JPanel productPanel8 = new JPanel(new BorderLayout());
+            productPanel8.setLayout(null); // Setting null layout
+            try {
+                URL imageURL = new URL(product.getImageURL());
+                BufferedImage img = ImageIO.read(imageURL);
+                JLabel imageLabel = new JLabel(new ImageIcon(img.getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+                imageLabel.setBounds(10, 10, 100, 100); // x, y, width, height
+
+                productPanel8.add(imageLabel);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            String fullName = product.getName();
+            int halfLength = fullName.length() / 2;
+
+            String firstName = fullName.substring(0, halfLength);
+            String lastName = fullName.substring(halfLength);
+
+            JTextArea detailsArea = new JTextArea(
+                    "      \n       " + firstName + "   \n      " + lastName + " \n\n       Rs. " + product.getPrice() + "/-" + "\n\n\n      " + product.getDescription()
+            );
+            detailsArea.setFont(new Font("Times new roman", Font.BOLD, 15));
+            detailsArea.setForeground(Color.BLACK);
+            detailsArea.setEditable(false);
+            detailsArea.setBounds(120, 10, 250, 130);
+            detailsArea.setBackground(customColor1);
+            productPanel8.add(detailsArea);
+
+            JButton viewProductButton8 = new JButton("View product");
+            viewProductButton8.setBounds(10, 112, 109, 30); // x, y, width, height
+            viewProductButton8.setFont(new Font("Times new Roman", Font.BOLD, 16));
+            viewProductButton8.setForeground(Color.BLACK);
+            viewProductButton8.setBackground(customColor1);
+            viewProductButton8.setEnabled(true);
+            viewProductButton8.setBorder(BorderFactory.createLineBorder(Color.red, 4)); // Add border
+
+            viewProductButton8.addActionListener(new ViewProduct8ActionListener(product));
+            productPanel8.add(viewProductButton8);
+
+            productPanel8.setBorder(BorderFactory.createLineBorder(customColor2, 8));
+            productsPanel8.add(productPanel8);
+        }
+    }
+
+    private class ViewProduct8ActionListener implements ActionListener {
+
+        private Product product;
+
+        public ViewProduct8ActionListener(Product product) {
+            this.product = product;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new ProductDetailsGUI(product);
+        }
+    }
+
+    private class NextButton8ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //currentPage++;
+            /* remove(Panel10);
+            add(Panel11, BorderLayout.CENTER);
+            setTitle("TROVE CART - MOBILE DEAL PAGE 2");
+            revalidate();
+            repaint();*/
+
+        }
+    }
+
+    private class BackButton8ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //if (currentPage > 0) {
+            // currentPage--;
+            remove(Panel11);
+            add(Panel10);
+            setTitle("TROVE CART - LANDING PAGE");
+            revalidate();
+            repaint();
+        }
+    }
+
+    // *********** START OF WELCOME PAGE *************
+    private class LogInButton1ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            logedIn1 = true;
+            LogInButton1.setEnabled(true); // Disable sign-up button after successful sign-up
+            remove(Panel0);
+            add(Panel1, BorderLayout.CENTER);
+            setTitle("TROVE CART - LOGIN PAGE");
+            revalidate();
+            repaint();
+        }
+    }
+
+    private class SignUpButton1ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            signedup1 = true;
+            SignUpButton1.setEnabled(true); // Disable sign-up button after successful sign-up
+            remove(Panel0);
+            add(Panel2, BorderLayout.CENTER);
+            setTitle("TROVE CART - SIGN UP PAGE");
+            revalidate();
+            repaint();
+        }
+    }
+
+    // *********** END OF WELCOME PAGE *************
+    // *********** START a LOGIN PAGE ***************
+    public class logInButton2ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String email = emailTextField.getText();
+            String password = new String(passwordField.getPassword());
+
+            if (!email.contains("@")) {
+                JOptionPane.showMessageDialog(null, "Email should contain '@' character!");
+                return;
+            }
+
+            try {
+                Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "system", "1234");
+                PreparedStatement stmt = con.prepareStatement("SELECT * FROM Signup_details WHERE Email = ? AND Password = ?");
+                stmt.setString(1, email);
+                stmt.setString(2, password);
+
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next()) {
+                    JOptionPane.showMessageDialog(null, "Log In Successful!");
+
+                    // Set the flag to false as the user has logged in after signing up
+                    firstTimeSignUp = false;
+
+                    logedIn2 = true;
+                    logInButton2.setEnabled(true);
+                    remove(Panel1);
+                    add(Panel4, BorderLayout.CENTER);
+                    setTitle("TROVE CART - LANDING PAGE");
+                    revalidate();
+                    repaint();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Invalid Email or Password!");
+                    System.out.println("\n Enter a valid Email and password or Signup first !!");
+                }
+            } catch (Exception ex) {
+                System.out.println(ex);
+            }
+        }
+    }
+
+    public class backButton1ActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            backed1 = true;
+            backButton1.setEnabled(true); // Disable sign-up button after successful sign-up
+            remove(Panel1);
+            add(Panel0, BorderLayout.CENTER);
+            setTitle("TROVE CART - LOGIN PAGE");
+            revalidate();
+            repaint();
+        }
+    }
+
+    // *********** END OF LOGIN PAGE *************
+    // *********** START OF SIGNUP PAGE *************
+    public class signUpButtonActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            // Code for login functionality after successful sign-up
+            String username = userNameTextField.getText();
+            String dob = dobTextField.getText();
+            String gender = genderTextField.getText();
+            String phoneno = phoneNumberTextField.getText();
+            String email = emailTextField_s1.getText();
+            String password = new String(passwordField_s1.getPassword());
+            String reEnteredPassword = new String(rePasswordField_s1.getPassword());
+            if (!password.equals(reEnteredPassword)) {
+                JOptionPane.showMessageDialog(null, "Passwords do not match!");
+                return;
+            }
+
+            if (phoneno.length() != 10) {
+                JOptionPane.showMessageDialog(null, "Phone number should be 10 digits!");
+                return;
+            }
+
+            if (!email.contains("@")) {
+                JOptionPane.showMessageDialog(null, "Email should contain '@' character!");
+                return;
+            }
+
+            // Implement login logic here after user signs up
+            // Example: Check credentials against a database after signup
+            String to = email; // Get the email from the signup form
+            String subject = "Welcome to Trove Cart - Your New Shopping Destination!";
+            String message = "Dear " + username + ",\n\nWelcome to Trove Cart - Your gateway to a seamless shopping experience!\nWe're thrilled to have you on board. Thank you for choosing us to be your shopping companion. With Trove Cart, get ready to explore a world of exquisite products, unbeatable deals, and a hassle-free checkout experience. Stay tuned for exclusive offers, latest arrivals, and personalized recommendations curated just for you. \nOur team is here to ensure that your journey with us is nothing short of exceptional. Should you have any queries or need assistance, don't hesitate to reach out to our dedicated support team. \n\nHappy shopping!" + "\n\nBest regards, \nTrove Cart Team";
+
+            // Email sending code (similar to your Email class)
+            final String emailUsername = "71762233001@cit.edu.in"; // Replace with your email
+            final String emailPassword = "Adityagan29.cit.2023"; // Replace with your password
+
+            Properties emailProps = new Properties();
+            emailProps.put("mail.smtp.auth", "true");
+            emailProps.put("mail.smtp.starttls.enable", "true");
+            emailProps.put("mail.smtp.host", "smtp.gmail.com");
+            emailProps.put("mail.smtp.port", "587");
+
+            Session emailSession = Session.getInstance(emailProps,
+                    new javax.mail.Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(emailUsername, emailPassword);
+                }
+            });
+
+            try {
+                Message emailMessage = new MimeMessage(emailSession);
+                emailMessage.setFrom(new InternetAddress(emailUsername));
+                emailMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+                emailMessage.setSubject(subject);
+                emailMessage.setText(message);
+
+                Transport.send(emailMessage);
+                System.out.println("\n Email sent successfully!");
+            } catch (MessagingException ex) {
+                System.out.println("\n Error sending email: " + ex.getMessage());
+            }
+
+            /*   try {
+                Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "system", "1234");
+                PreparedStatement stmt = con.prepareStatement("INSERT INTO Login_1 (Username, Userid, Dob, Gender, Email, Password, Phoneno) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                stmt.setString(1, username);
+                stmt.setString(2, userid);
+                stmt.setString(3, dob);
+                stmt.setString(4, gender);
+                stmt.setString(5, email);
+                stmt.setString(6, password);
+                stmt.setString(7, phoneno);
+
+                int rowsInserted = stmt.executeUpdate();
+                if (rowsInserted > 0) {              */
+            JOptionPane.showMessageDialog(null, "Sign Up Successful!");
+            System.out.println("\n Sign Up Detail(s) was inserted successfully!");
+            signedUp2 = true;
+            signUpButton.setEnabled(true); // Disable sign-up button after successful sign-up
+            remove(Panel2);
+            add(Panel3, BorderLayout.CENTER);
+            setTitle("TROVE CART - ADDRESS PAGE");
+            revalidate();
+            repaint();
+            /*     }
+            } catch (Exception ex) {
+                System.out.println(ex);
+            } */
+        }
+    }
+
+    // ************* END OF SIGNUP PAGE **************** 
+    // ************* START OF ADDRESS PAGE **************
+    public class saveAddressButtonActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            String username = userNameTextField.getText();
+            String dob = dobTextField.getText();
+            String gender = genderTextField.getText();
+            String phoneno = phoneNumberTextField.getText();
+            String email = emailTextField_s1.getText();
+            String password = new String(passwordField_s1.getPassword());
+
+            // Code for login functionality after successful sign-up
+            String doorno = doorNoTextField.getText();
+            String streetname = streetNameTextField.getText();
+            String town = townTextField.getText();
+            String district = districtTextField.getText();
+            String state = stateTextField.getText();
+            String pincode = pincodeTextField.getText();
+
+            // Implement login logic here after user signs up
+            // Example: Check credentials against a database after signup
+            try {
+                Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL", "system", "1234");
+                PreparedStatement stmt = con.prepareStatement("INSERT INTO Signup_Details (username, dob, gender, phoneno, email, password, doorno, streetname, town, district, state, pincode) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+                stmt.setString(1, username);
+                stmt.setString(2, dob);
+                stmt.setString(3, gender);
+                stmt.setString(4, phoneno);
+                stmt.setString(5, email);
+                stmt.setString(6, password);
+
+                stmt.setString(7, doorno);
+                stmt.setString(8, streetname);
+                stmt.setString(9, town);
+                stmt.setString(10, district);
+                stmt.setString(11, state);
+                stmt.setString(12, pincode);
+
+                int rowsInserted = stmt.executeUpdate();
+                if (rowsInserted > 0) {
+                    JOptionPane.showMessageDialog(null, "Address Saved Successfully!");
+                    System.out.println("\n Address Detail(s) was inserted successfully!");
+                    saved = true;
+                    // Toggle the flag as the user has successfully signed up
+                    firstTimeSignUp = false;
+
+                    saveAddressButton.setEnabled(true); // Disable sign-up button after successful sign-up
+                    remove(Panel3);
+                    add(Panel1, BorderLayout.CENTER);
+                    setTitle("TROVE CART - LOGIN PAGE");
+                    revalidate();
+                    repaint();
+                }
+            } catch (Exception ex) {
+                System.out.println(ex);
+            }
+        }
+    }
+
+}
+
+public class Trove {
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            new Trove_cart();
+        });
+    }
+}
