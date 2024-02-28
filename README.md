@@ -1,6 +1,6 @@
 ﻿# Trove Cart
 
-**Trove Cart** is a desktop e-commerce application built with **Java Swing** and **Apache NetBeans**. It provides a complete shopping experience â€” from user registration and login to browsing products by category, viewing product details, managing a cart, and completing checkout.
+**Trove Cart** is a desktop e-commerce application built with **Java Swing** and **Apache NetBeans**. It provides a complete shopping experience — from user registration and login to browsing products by category, viewing product details, managing a cart, and completing checkout.
 
 The application connects to an **Oracle Database** using the **OJDBC7** JDBC driver to store user credentials, addresses, and product catalog data in **MYSQL** Database.
 
@@ -52,62 +52,62 @@ The application connects to an **Oracle Database** using the **OJDBC7** JDBC dri
 
 ```
 Trove Cart Java Swing Project/
-â”‚
-â”œâ”€â”€ Project/                          # Apache NetBeans project (main source)
-â”‚   â”œâ”€â”€ src/
-â”‚   â”‚   â”œâ”€â”€ Welcome.java              # Panel 0 â€“ Welcome / entry screen
-â”‚   â”‚   â”œâ”€â”€ Login.java                # Panel 1 â€“ Login form
-â”‚   â”‚   â”œâ”€â”€ Signup.java               # Panel 2 â€“ Registration form
-â”‚   â”‚   â”œâ”€â”€ Address.java              # Panel 3 â€“ Address form
-â”‚   â”‚   â””â”€â”€ Landing_page.java         # Panel 4+ â€“ E-commerce landing & deals
-â”‚   â”œâ”€â”€ nbproject/                    # NetBeans project configuration
-â”‚   â”œâ”€â”€ build.xml                     # Ant build script
-â”‚   â””â”€â”€ dist/                         # Compiled JAR output
-â”‚
-â”œâ”€â”€ Final Cat files/                  # Integrated submission code (CAT exam)
-â”‚   â”œâ”€â”€ Full main code.txt            # Complete single-file application
-â”‚   â”œâ”€â”€ Full main code-1.txt          # Updated integrated version
-â”‚   â””â”€â”€ addtocartb.txt                # Add-to-cart module reference
-â”‚
-â”œâ”€â”€ Attachments/                      # UI assets (images, GIFs, videos, banners)
-â”‚   â”œâ”€â”€ Welcome page/
-â”‚   â”œâ”€â”€ Login page/
-â”‚   â”œâ”€â”€ Signup page/
-â”‚   â”œâ”€â”€ Address page/
-â”‚   â”œâ”€â”€ Logo/
-â”‚   â”œâ”€â”€ Category icons/
-â”‚   â”œâ”€â”€ Slide banners/
-â”‚   â””â”€â”€ Product images/               # Product photos by category
-â”‚
-â”œâ”€â”€ JAR FILES/                        # External library dependencies
-â”œâ”€â”€ Trove java report.docx            # Project documentation report
-â””â”€â”€ README.md
+|
+|-- Project/                          # Apache NetBeans project (main source)
+|   |-- src/
+|   |   |-- Welcome.java              # Panel 0 - Welcome / entry screen
+|   |   |-- Login.java                # Panel 1 - Login form
+|   |   |-- Signup.java               # Panel 2 - Registration form
+|   |   |-- Address.java              # Panel 3 - Address form
+|   |   `-- Landing_page.java         # Panel 4+ - E-commerce landing & deals
+|   |-- nbproject/                    # NetBeans project configuration
+|   |-- build.xml                     # Ant build script
+|   `-- dist/                         # Compiled JAR output
+|
+|-- Final Cat files/                  # Integrated submission code (CAT exam)
+|   |-- Full main code.txt            # Complete single-file application
+|   |-- Full main code-1.txt          # Updated integrated version
+|   `-- addtocartb.txt                # Add-to-cart module reference
+|
+|-- Attachments/                      # UI assets (images, GIFs, videos, banners)
+|   |-- Welcome page/
+|   |-- Login page/
+|   |-- Signup page/
+|   |-- Address page/
+|   |-- Logo/
+|   |-- Category icons/
+|   |-- Slide banners/
+|   `-- Product images/               # Product photos by category
+|
+|-- JAR FILES/                        # External library dependencies
+|-- Trove java report.docx            # Project documentation report
+`-- README.md
 ```
 
-> **Note:** The `Project/src/` folder contains **modular** screen files (each runnable independently). The `Final Cat files/` folder contains the **full integrated** application with all panels combined into a single class â€” this is the version submitted for evaluation.
+> **Note:** The `Project/src/` folder contains **modular** screen files (each runnable independently). The `Final Cat files/` folder contains the **full integrated** application with all panels combined into a single class — this is the version submitted for evaluation.
 
 ---
 
 ## Application Flow
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚   Welcome   â”‚â”€â”€â”€â”€â–¶â”‚    Login    â”‚â”€â”€â”€â”€â–¶â”‚  Landing    â”‚
-â”‚  (Panel 0)  â”‚     â”‚  (Panel 1)  â”‚     â”‚  (Panel 4)  â”‚
-â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜     â””â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜
-       â”‚                                         â”‚
-       â–¼                                         â–¼
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚   Sign Up   â”‚â”€â”€â”€â”€â–¶â”‚   Address   â”‚â”€â”€â”€â”€â–¶â”‚   Login     â”‚
-â”‚  (Panel 2)  â”‚     â”‚  (Panel 3)  â”‚     â”‚  (Panel 1)  â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
++-------------+     +-------------+     +-------------+
+|   Welcome   |---->|    Login    |---->|  Landing    |
+|  (Panel 0)  |     |  (Panel 1)  |     |  (Panel 4)  |
++------+------+     +-------------+     +------+------+
+       |                                       |
+       v                                       v
++-------------+     +-------------+     +-------------+
+|   Sign Up   |---->|   Address   |---->|   Login     |
+|  (Panel 2)  |     |  (Panel 3)  |     |  (Panel 1)  |
++-------------+     +-------------+     +-------------+
 
 Landing Page (Panel 4)
-    â”œâ”€â”€ Category browsing (Panels 8â€“21)
-    â”œâ”€â”€ Top Deals pages (Panels 5â€“7)
-    â”œâ”€â”€ Product details â†’ Add to Cart
-    â”œâ”€â”€ My Cart â†’ Payment
-    â””â”€â”€ Search products
+    |-- Category browsing (Panels 8-21)
+    |-- Top Deals pages (Panels 5-7)
+    |-- Product details -> Add to Cart
+    |-- My Cart -> Payment
+    `-- Search products
 ```
 
 ### Panel Map (Full Integrated Version)
@@ -119,14 +119,14 @@ Landing Page (Panel 4)
 | 2 | Sign Up |
 | 3 | Address |
 | 4 | Landing page (home) |
-| 5â€“7 | Top Deals of the Day |
-| 8â€“9 | Grocery category |
-| 10â€“11 | Mobile category |
-| 12â€“13 | Men's Fashion category |
-| 14â€“15 | Women's Fashion category |
-| 16â€“17 | Electronics category |
-| 18â€“19 | Beauty category |
-| 20â€“21 | Kids section |
+| 5-7 | Top Deals of the Day |
+| 8-9 | Grocery category |
+| 10-11 | Mobile category |
+| 12-13 | Men's Fashion category |
+| 14-15 | Women's Fashion category |
+| 16-17 | Electronics category |
+| 18-19 | Beauty category |
+| 20-21 | Kids section |
 
 
 ## Prerequisites
@@ -138,10 +138,10 @@ Before running the project, ensure you have:
 3. **Oracle Database** installed and running locally
 4. **Oracle SQL Developer** or similar tool to create tables and insert data
 5. Required **JAR files** (available in the `JAR FILES/` folder):
-   - `ojdbc7.jar` â€” Oracle JDBC driver
-   - `javax.mail.jar` â€” Email support
-   - `comm-2.0.jar` â€” Apache Commons utilities
-   - `trident.jar` â€” UI animation library
+   - `ojdbc7.jar` — Oracle JDBC driver
+   - `javax.mail.jar` — Email support
+   - `comm-2.0.jar` — Apache Commons utilities
+   - `trident.jar` — UI animation library
 
 ---
 
@@ -189,7 +189,7 @@ Use a Gmail **App Password** if two-factor authentication is enabled.
 ### 5. Add JAR dependencies in NetBeans
 
 1. Open the `Project/` folder in NetBeans.
-2. Right-click the project â†’ **Properties** â†’ **Libraries**.
+2. Right-click the project → **Properties** → **Libraries**.
 3. Add the following JARs from the `JAR FILES/` folder:
    - `ojdbc7.jar`
    - `javax.mail.jar`
@@ -199,7 +199,7 @@ Use a Gmail **App Password** if two-factor authentication is enabled.
 
 ### 6. Build the project
 
-In NetBeans: **Run** â†’ **Clean and Build Project** (or press `Shift + F11`).
+In NetBeans: **Run** → **Clean and Build Project** (or press `Shift + F11`).
 
 Or from the command line:
 
@@ -242,7 +242,7 @@ Copy the contents of `Final Cat files/Full main code.txt` (or `Full main code-1.
 The `Attachments/` folder contains all visual assets used in the application:
 
 | Folder | Contents |
-|--------|----------|
+|--------|---------|
 | `Welcome page/` | Welcome screen banners and GIFs |
 | `Login page/` | Login screen animations |
 | `Signup page/` | Sign-up promotional media |
